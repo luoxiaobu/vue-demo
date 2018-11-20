@@ -1,23 +1,30 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view/>
+    <div class="app-header">
+      <a-header></a-header>
+      <a-tab></a-tab>
+    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
+import AHeader from './components/a-header/AHeader'
+import ATab from './components/a-tab/ATab'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    AHeader, ATab
+  }
 }
 </script>
 
-<style>
+<style lang="stylus">
+@import "./themes/common"
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  .app-header {
+    background: #d43c33;
+  }
 }
 </style>
