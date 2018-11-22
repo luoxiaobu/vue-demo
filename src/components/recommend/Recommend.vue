@@ -5,7 +5,11 @@
 </template>
 
 <script>
+import { getRecommend } from 'service/recommend'
 export default {
+  mounted () {
+    getRecommend()
+  }
 }
 </script>
 
