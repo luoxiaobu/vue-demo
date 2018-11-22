@@ -8,7 +8,9 @@
 import { getRecommend } from 'service/recommend'
 export default {
   mounted () {
-    getRecommend()
+    getRecommend().then((data) => {
+      console.log(data)
+    })
   }
 }
 </script>

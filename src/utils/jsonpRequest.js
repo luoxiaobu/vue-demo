@@ -15,7 +15,7 @@ export function jsonpRequest (url, data, opts) {
     opts.timeout = opts.timeout || 30000
     jsonpOrigin(spliceUrl(url, data), opts, (err, data) => {
       if (!err && data.code === 0) {
-        resolve(data)
+        resolve(data.data || {})
       } else {
         reject(err)
       }
