@@ -8,7 +8,7 @@ import { isObject } from './tools'
  * @param {Object} optional data
  * @param {Function} optional opts
  */
-
+// see jsonp options.name is important
 export function jsonpRequest (url, data, opts) {
   return new Promise((resolve, reject) => {
     opts = opts || {}

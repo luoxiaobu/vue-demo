@@ -10,6 +10,7 @@ export default {
   mounted () {
     getRecommend().then((data) => {
       console.log(data)
+    }).catch(() => {
     })
   }
 }
