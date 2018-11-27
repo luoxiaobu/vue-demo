@@ -3,9 +3,7 @@
     <slot></slot>
   </div>
   <div class="a-swipe-dot" v-show="showDot">
-    <div class="a-swipe-dot-item"
-      v-for="(page, $index) in pages"
-      :class="{ 'is-active': $index === index }"></div>
+    <span :class="['a-swipe-dot-item',{'is-active': currentPageIndex === index }" v-for="(item, index) in dots"></span>
   </div>
 </template>
 
@@ -20,6 +18,14 @@
       showDot: {
         type: Boolean,
         default: false
+      },
+      autoPlay: {
+        type: Boolean,
+        default: true
+      },
+      interval: {
+        type: Number,
+        default: 4000
       }
     },
     methods: {
