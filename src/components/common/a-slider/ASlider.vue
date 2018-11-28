@@ -42,19 +42,20 @@
         var length = children.length;
         this.noDrag = children.length === 1;
         if (!this.noDrag) {
-          pagesTemp.push(children[0]);
           length = length + 2;
         }
         children.forEach((child, index) => {
           pagesTemp.push(child);
-          child.$el.classList.remove('is-active');
-          const c = child;
-          c.$el.style.width = `${100 / children.length}%`;
-          c.$el.style.left = `${(100 * index) / children.length}%`;
-          if (index === this.defaultIndex) {
-            child.$el.classList.add('is-active');
-          }
+          const childEle = child.$el;
+          childEle.classList.remove('is-active');
+          childEle.classList.add('slider-item');
+          childEle.style.width = `${100 / length}%`;
         });
+        if (!this.noDrag) {
+          pagesTemp.push(children[0]);
+          pagesTemp.unshift(children[children.length-1])
+          children[1].$el.classList.add('is-active')
+        }
         this.pages = pagesTemp;
       },
       initSliderItem () {
