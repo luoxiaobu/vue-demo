@@ -16,11 +16,15 @@ export default {
       recommendList: []
     }
   },
+  methods: {
+    getRecommend () {
+      getRecommend().then((data) => {
+        this.recommendList = data.slider;
+      }).catch(() => {})
+    }
+  },
   mounted () {
-    getRecommend().then((data) => {
-      this.recommendList = data.slider;
-    }).catch(() => {
-    })
+    this.getRecommend();
   }
 }
 </script>

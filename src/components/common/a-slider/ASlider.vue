@@ -29,7 +29,6 @@ export default {
       isActive: 1,
       startTime: 0,
       timer: 0,
-      reInitTimer: null,
       panelTransform: '',
       panelTransition: '',
       errorUrl: () => {}
@@ -42,7 +41,7 @@ export default {
     },
     autoPlay: {
       type: Boolean,
-      default: false
+      default: true
     },
     interval: {
       type: Number,
@@ -101,7 +100,10 @@ export default {
         this.container.unshift(this.pages[this.pages.length - 1])
       }
       this.setPanelTransform(this.isActive);
-      this.carousel();
+      if (this.canDrag && this.autoPlay) {
+        this.stopCarousel();
+        this.carousel();
+      }
     },
     prev (length, isActive) {
       var pageto = isActive - 1;
@@ -163,19 +165,11 @@ export default {
       return Math.abs(ev.touches[0].clientY - this.startClientY) - Math.abs(ev.touches[0].clientX - this.startClientX) > 0 ? 'y' : 'x';
     },
     hlPanstart (ev) {
-      this.stopCarousel();
-      if (this.startSwipe) {
-        return;
-      }
       this.startClientX = ev.touches[0].clientX;
       this.startClientY = ev.touches[0].clientY;
       this.startTime = +new Date();
     },
     hlPanmove (ev) {
-      this.stopCarousel();
-      if (this.swiping) {
-        return;
-      }
       if (!this.axis) {
         this.axis = this.getDirection(ev)
       }
@@ -223,7 +217,7 @@ export default {
           if (that.$el) {
             that.$el.removeEventListener(transitionEndEvent, endFunc);
           }
-          if (this.canDrag && this.autoPlay) {
+          if (that.canDrag && that.autoPlay) {
             that.stopCarousel();
             that.carousel();
           }
