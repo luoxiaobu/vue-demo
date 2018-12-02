@@ -2,7 +2,9 @@
   <div class="a-slider">
     <div class="a-slider-panel clearfix" :style="[styleTransform,styleTransition,panelWidth]" ref="wrap">
       <div class="slider-item" v-for="(item, index) in container" :style="{width: viewWidth}" :key="index">
-        <img v-if="item.picUrl" @error="errorUrl" :src="item.picUrl" width="100%">
+        <a :href="item.linkUrl">
+          <img v-if="item.picUrl" @error="errorUrl" :src="item.picUrl" width="100%">
+        </a>
       </div>
     </div>
     <div class="a-swipe-dot" v-show="showDot">
@@ -305,6 +307,7 @@ export default {
   }
   img {
     vertical-align: middle;
+    background: #E7E7E7;
   }
 }
 </style>
