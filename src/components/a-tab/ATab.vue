@@ -23,8 +23,6 @@ export default {
 <style lang="stylus">
 @import "../../themes/variable"
   .a-tab {
-    height: 44px;
-    line-height: 44px;
     font-size: $font-size-medium;
     .tab-item {
       flex: 1;
@@ -32,13 +30,16 @@ export default {
     }
     .router-link-active {
       .tab-link {
-        color: #fff;
-        border-bottom: 2px solid #fff;
+        color: $color-theme;
+        border-bottom: 2px solid $color-theme;
       }
     }
     .tab-link {
-      color: #fff;
-      padding: 5px;
+      color: $color-text-dark;
+      border-bottom: 2px solid transparent;
+      padding: 0px 10px;
+      display: inline-block;
+      line-height: 40px;
     }
   }
 </style>

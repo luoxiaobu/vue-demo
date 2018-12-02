@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="app-header">
+    <div>
       <a-header></a-header>
       <a-tab></a-tab>
     </div>
@@ -23,8 +23,5 @@ export default {
 <style lang="stylus">
 @import "./themes/common"
 #app {
-  .app-header {
-    background: #d43c33;
-  }
 }
 </style>

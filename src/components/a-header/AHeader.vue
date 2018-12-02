@@ -13,10 +13,10 @@ export default {
 <style lang="stylus">
 @import "../../themes/variable"
 .a-header {
+  background: $color-theme;
   position: relative;
   height: 44px;
   text-align: center;
-  color: $color-theme;
   font-size: 0;
   .icon, .text {
     display: inline-block;
@@ -33,7 +33,7 @@ export default {
   .text {
     line-height: 44px;
     font-size: $font-size-large;
-    color: #fff;
+    color: $color-text-light;
   }
 }
 </style>

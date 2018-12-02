@@ -12,7 +12,7 @@ export function axiosRequest (config = {}) {
     var data = res.data || res;
     // may handle some common error
     if (data.code === 0) {
-      return data;
+      return data.data;
     }
     return Promise.reject(data);
   });
