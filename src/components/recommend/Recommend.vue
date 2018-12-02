@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { getRecommend } from 'service/recommend'
+import { getRecommend, getPlaylist } from 'service/recommend'
 import ASlider from 'components/common/a-slider/ASlider'
 export default {
   components: {
@@ -21,10 +21,16 @@ export default {
       getRecommend().then((data) => {
         this.recommendList = data.slider;
       }).catch(() => {})
+    },
+    getPlaylist () {
+      getPlaylist().then((data) => {
+        console.log(data)
+      })
     }
   },
   mounted () {
     this.getRecommend();
+    this.getPlaylist();
   }
 }
 </script>
