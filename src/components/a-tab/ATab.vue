@@ -39,7 +39,8 @@ export default {
       border-bottom: 2px solid transparent;
       padding: 0px 10px;
       display: inline-block;
-      line-height: 40px;
+      line-height: 44px;
+      height: 44px;
     }
   }
 </style>

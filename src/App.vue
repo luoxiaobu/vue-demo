@@ -21,7 +21,6 @@ export default {
 </script>
 
 <style lang="stylus">
-@import "./themes/common"
 #app {
 }
 </style>
