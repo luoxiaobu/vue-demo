@@ -6,6 +6,7 @@
 
 <script>
 import { getSingerList } from 'service/singer'
+import Singer from './singerData.js'
 
 const HOT_SINGER_NUM = 10;
 const HOT_NAME = 'hot'
@@ -31,11 +32,10 @@ export default {
       }
       list.forEach((item, index) => {
         if (index < HOT_SINGER_NUM) {
-          map.hot.items.push({
-            id: item.Fsinger_mid,
+          map.hot.items.push(new Singer({
             name: item.Fsinger_name,
-            avatar: `https://y.gtimg.cn/music/photo_new/T001R300x300M00000${item.Fsinger_mid}.jpg?max_age=2592000`
-          })
+            id: item.Fsinger_mid
+          }))
         }
         const key = item.Findex
         if (!map[key]) {
@@ -44,11 +44,10 @@ export default {
             items: []
           }
         }
-        map[key].items.push({
-          id: item.Fsinger_mid,
+        map[key].items.push(new Singer({
           name: item.Fsinger_name,
-          avatar: `https://y.gtimg.cn/music/photo_new/T001R300x300M00000${item.Fsinger_mid}.jpg?max_age=2592000`
-        })
+          id: item.Fsinger_mid
+        }))
       })
       let ret = []
       let hot = []
