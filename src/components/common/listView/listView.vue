@@ -5,7 +5,7 @@
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
           <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
-            <img class="avatar" :src="item.avatar">
+            <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
           </li>
         </ul>
@@ -26,7 +26,9 @@ export default {
 <style lang="stylus">
 @import "../../../themes/variable"
 .list-view {
-  .list-group {}
+  .list-group {
+    padding-top: 20px;
+  }
   .list-group-title {
     height: 30px;
     line-height: 30px;
