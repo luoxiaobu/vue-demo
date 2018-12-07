@@ -11,15 +11,16 @@
         </ul>
       </li>
     </ul>
-    <div class="side-bar">
-      <div class="side-bar-item" v-for="(title, index) in barData" :key="index">
+    <div class="side-bar" v-if="barData.length" @touchstart="sideBarstart">
+      <div class="side-bar-item" v-for="(title, index) in barData" :key="index" :data-index="index">
         {{title}}
       </div>
     </div>
   </a-scroll>
 </template>
 <script>
-import AScroll from './AScroll'
+import AScroll from './AScroll';
+import { getData } from '@/utils/tools.js'
 export default {
   components: {
     AScroll
@@ -30,6 +31,12 @@ export default {
       default: () => []
     }
   },
+  data () {
+    return {
+      startClientY: 0,
+      startIndex: 0
+    }
+  },
   computed: {
     barData () {
       return this.data.map((group) => {
@@ -38,6 +45,10 @@ export default {
     }
   },
   methods: {
+    sideBarstart (ev) {
+      this.startClientY = ev.touches[0].clientY;
+      this.startIndex = getData(ev.target);
+    }
   }
 }
 </script>

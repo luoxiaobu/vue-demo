@@ -16,7 +16,7 @@
 <script type="text/javascript">
 import { transitionEndEvent, getTranslate } from '@/utils/animation';
 
-const moveThreshold = 25;
+const moveThreshold = 20;
 const maxListShowed = 3;
 export default {
   data () {
@@ -167,11 +167,13 @@ export default {
       return Math.abs(ev.touches[0].clientY - this.startClientY) - Math.abs(ev.touches[0].clientX - this.startClientX) > 0 ? 'y' : 'x';
     },
     hlPanstart (ev) {
+      this.stopCarousel();
       this.startClientX = ev.touches[0].clientX;
       this.startClientY = ev.touches[0].clientY;
       this.startTime = +new Date();
     },
     hlPanmove (ev) {
+      this.stopCarousel();
       if (!this.axis) {
         this.axis = this.getDirection(ev)
       }
@@ -186,10 +188,15 @@ export default {
       this.moveView(diff);
     },
     hlPanend (ev) {
+      this.stopCarousel();
+      // ev.touches.length > 0 there have other fingers
       if (ev.touches.length > 0) {
         return;
       }
       if (this.axis === 'y') {
+        if (this.autoPlay) {
+          this.carousel();
+        }
         this.axis = null;
         return;
       }
@@ -239,7 +246,6 @@ export default {
     this.reInitPages()
     var element = this.$refs.wrap;
     element.addEventListener('touchstart', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
@@ -248,7 +254,6 @@ export default {
       }
     });
     element.addEventListener('touchmove', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
@@ -257,7 +262,6 @@ export default {
       }
     });
     element.addEventListener('touchend', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
