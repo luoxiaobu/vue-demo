@@ -1,12 +1,13 @@
 <template>
-  <div>
-    singer
+  <div class="singer">
+    <listView :data="singerList"></listView>
   </div>
 </template>
 
 <script>
 import { getSingerList } from 'service/singer'
 import Singer from './singerData.js'
+import listView from '../common/ListView'
 
 const HOT_SINGER_NUM = 10;
 const HOT_NAME = 'hot'
@@ -16,11 +17,13 @@ export default {
       singerList: []
     }
   },
+  components: {
+    listView
+  },
   methods: {
     getSingerList () {
       getSingerList().then((data) => {
         this.singerList = this.normalizeSinger(data.list);
-        console.log(this.singerList)
       }).catch(() => {})
     },
     normalizeSinger (list) {
@@ -53,10 +56,10 @@ export default {
       let hot = []
       for (let key in map) {
         let val = map[key]
-        if (val.title.match(/[a-zA-Z]/)) {
-          ret.push(val)
-        } else if (val.title === HOT_NAME) {
+        if (val.title === HOT_NAME) {
           hot.push(val)
+        } else if (val.title.match(/[a-zA-Z]/)) {
+          ret.push(val)
         }
       }
       ret.sort((a, b) => {
@@ -72,4 +75,6 @@ export default {
 </script>
 
 <style lang="stylus">
+.singer {
+}
 </style>
