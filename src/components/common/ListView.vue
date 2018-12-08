@@ -83,6 +83,7 @@ export default {
     padding-bottom: 20px;
   }
   .side-bar {
+    touch-action: none;
     position: absolute;
     z-index: 30
     right: 0;

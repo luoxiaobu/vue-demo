@@ -301,6 +301,9 @@ export default {
   overflow: hidden;
   position: relative;
 }
+.a-slider-panel {
+  touch-action: none;
+}
 .clearfix:after{
   content: '';
   display: block;
