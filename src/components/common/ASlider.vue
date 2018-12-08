@@ -181,7 +181,9 @@ export default {
       if (this.axis === 'y') {
         return;
       }
-      ev.preventDefault();
+      if (ev.cancelable) {
+        ev.preventDefault();
+      }
       const diff = ev.touches[0].clientX - this.startClientX;
       if (Math.abs(diff) < moveThreshold) {
         return;

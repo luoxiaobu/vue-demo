@@ -1,7 +1,7 @@
 <template>
-  <a-scroll class="list-view">
+  <a-scroll class="list-view" ref="listview">
     <ul>
-      <li v-for="group in data" class="list-group" :key="group.title">
+      <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul class="list-group-block">
           <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
@@ -11,7 +11,7 @@
         </ul>
       </li>
     </ul>
-    <div class="side-bar" v-if="barData.length" @touchstart="sideBarstart">
+    <div class="side-bar" v-if="barData.length" @touchstart.stop="barTouchStart" @touchmove.stop="barTouchMove">
       <div class="side-bar-item" v-for="(title, index) in barData" :key="index" :data-index="index">
         {{title}}
       </div>
@@ -20,7 +20,8 @@
 </template>
 <script>
 import AScroll from './AScroll';
-import { getData } from '@/utils/tools.js'
+import { getData } from '@/utils/tools.js';
+const SID_ITEM_HEIGHT = 18;
 export default {
   components: {
     AScroll
@@ -34,20 +35,65 @@ export default {
   data () {
     return {
       startClientY: 0,
-      startIndex: 0
+      startIndex: 0,
+      listHeight: [],
+      scrollY: 0
     }
   },
   computed: {
     barData () {
       return this.data.map((group) => {
-        return group.title.substr(0, 1)
+        return group.title.substr(0, 1);
       })
     }
   },
+  watch: {
+    data () {
+      setTimeout(() => {
+        this.calculateHeight()
+      }, 20)
+    }
+  },
   methods: {
-    sideBarstart (ev) {
+    barTouchStart (ev) {
+      if (ev.cancelable) {
+        ev.preventDefault();
+      }
       this.startClientY = ev.touches[0].clientY;
-      this.startIndex = getData(ev.target);
+      this.startIndex = parseInt(getData(ev.target, 'index'));
+    },
+    barTouchMove (ev) {
+      if (ev.cancelable) {
+        ev.preventDefault();
+      }
+      let diff = ev.touches[0].clientY - this.startClientY;
+      let moveItem = diff / SID_ITEM_HEIGHT | 0;
+      if (moveItem) {
+        this.scrollTo(moveItem + this.startIndex);
+      }
+    },
+    calculateHeight () {
+      this.listHeight = []
+      const list = this.$refs.listGroup
+      let height = 0
+      this.listHeight.push(height)
+      for (let i = 0; i < list.length - 1; i++) {
+        let item = list[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+    scrollTo (index) {
+      if (!index && index !== 0) {
+        return
+      }
+      if (index < 0) {
+        index = 0
+      } else if (index > this.listHeight.length - 1) {
+        index = this.listHeight.length - 1
+      }
+      this.scrollY = this.listHeight[index]
+      this.$refs.listview.scrollTo(this.scrollY)
     }
   }
 }

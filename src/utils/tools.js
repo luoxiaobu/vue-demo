@@ -2,6 +2,7 @@ export function isObject (data) {
   return Object.prototype.toString.call(data) === '[object Object]'
 }
 
+// data-*  have compatibility issues , still use getAtrribute
 export function getData (el, dataName, value) {
   let name = 'data-' + dataName
   if (value) {

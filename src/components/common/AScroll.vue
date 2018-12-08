@@ -1,7 +1,7 @@
 <template>
   <div class="scroll-wrap" :style="{top:positionTop}">
-    <div class="scroll">
-      <slot></slot>
+    <div class="scroll" ref="scroll">
+      <slot class="scroll"></slot>
     </div>
   </div>
 </template>
@@ -20,14 +20,20 @@ export default {
     positionTop () {
       return this.top || HEAD_HEIGHT
     }
+  },
+  methods: {
+    scrollTo (y) {
+      this.$refs.scroll.scrollTop = y;
+    }
   }
 }
 </script>
 <style lang="stylus">
 .scroll-wrap {
-  position: absolute
-  width: 100%
-  bottom: 0
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
   .scroll {
     height: 100%
     overflow-x: scroll;
