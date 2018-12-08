@@ -16,7 +16,7 @@
 <script type="text/javascript">
 import { transitionEndEvent, getTranslate } from '@/utils/animation';
 
-const moveThreshold = 25;
+const moveThreshold = 20;
 const maxListShowed = 3;
 export default {
   data () {
@@ -33,7 +33,8 @@ export default {
       timer: 0,
       panelTransform: '',
       panelTransition: '',
-      errorUrl: () => {}
+      errorUrl: () => {},
+      endFunc: () => {}
     }
   },
   props: {
@@ -167,11 +168,13 @@ export default {
       return Math.abs(ev.touches[0].clientY - this.startClientY) - Math.abs(ev.touches[0].clientX - this.startClientX) > 0 ? 'y' : 'x';
     },
     hlPanstart (ev) {
+      this.stopCarousel();
       this.startClientX = ev.touches[0].clientX;
       this.startClientY = ev.touches[0].clientY;
       this.startTime = +new Date();
     },
     hlPanmove (ev) {
+      this.stopCarousel();
       if (!this.axis) {
         this.axis = this.getDirection(ev)
       }
@@ -186,10 +189,15 @@ export default {
       this.moveView(diff);
     },
     hlPanend (ev) {
+      this.stopCarousel();
+      // ev.touches.length > 0 there have other fingers
       if (ev.touches.length > 0) {
         return;
       }
       if (this.axis === 'y') {
+        if (this.autoPlay) {
+          this.carousel();
+        }
         this.axis = null;
         return;
       }
@@ -214,17 +222,18 @@ export default {
     checkAnimationEnd () {
       var that = this;
       return new Promise((resolve, reject) => {
-        var endFunc = () => {
+        this.endFunc = () => {
           resolve();
           if (that.$el) {
-            that.$el.removeEventListener(transitionEndEvent, endFunc);
+            that.$el.removeEventListener(transitionEndEvent, this.endFunc);
+            this.endFunc = null;
           }
           if (that.canDrag && that.autoPlay) {
             that.stopCarousel();
             that.carousel();
           }
         };
-        that.$el.addEventListener(transitionEndEvent, endFunc);
+        that.$el.addEventListener(transitionEndEvent, this.endFunc);
       });
     },
     carousel () {
@@ -233,13 +242,20 @@ export default {
     stopCarousel () {
       clearTimeout(this.timer);
       this.timer = null;
+    },
+    resetALL () {
+      this.setPanelTransition('');
+      clearTimeout(this.timer);
+      if (this.endFunc) {
+        this.$el && this.$el.removeEventListener(transitionEndEvent, this.endFunc);
+        this.endFunc = null;
+      }
     }
   },
   mounted () {
     this.reInitPages()
     var element = this.$refs.wrap;
     element.addEventListener('touchstart', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
@@ -248,7 +264,6 @@ export default {
       }
     });
     element.addEventListener('touchmove', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
@@ -257,7 +272,6 @@ export default {
       }
     });
     element.addEventListener('touchend', (event) => {
-      this.stopCarousel();
       if (this.swiping) {
         return;
       }
@@ -266,8 +280,18 @@ export default {
       }
     });
   },
+  activated () {
+    this.setPanelTransform(this.isActive);
+    if (this.canDrag && this.autoPlay) {
+      this.stopCarousel();
+      this.carousel();
+    }
+  },
   beforeDestroy () {
     clearTimeout(this.timer);
+  },
+  deactivated () {
+    this.resetALL();
   }
 }
 </script>

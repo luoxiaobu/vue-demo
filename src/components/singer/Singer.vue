@@ -1,15 +1,13 @@
 <template>
   <div class="singer">
-    <div class="singer-content">
-      <listView :data="singerList"></listView>
-    </div>
+    <listView :data="singerList"></listView>
   </div>
 </template>
 
 <script>
 import { getSingerList } from 'service/singer'
 import Singer from './singerData.js'
-import listView from '../common/listView/ListView'
+import listView from '../common/ListView'
 
 const HOT_SINGER_NUM = 10;
 const HOT_NAME = 'hot'
@@ -58,10 +56,10 @@ export default {
       let hot = []
       for (let key in map) {
         let val = map[key]
-        if (val.title.match(/[a-zA-Z]/)) {
-          ret.push(val)
-        } else if (val.title === HOT_NAME) {
+        if (val.title === HOT_NAME) {
           hot.push(val)
+        } else if (val.title.match(/[a-zA-Z]/)) {
+          ret.push(val)
         }
       }
       ret.sort((a, b) => {
@@ -78,13 +76,5 @@ export default {
 
 <style lang="stylus">
 .singer {
-  position: fixed
-  width: 100%
-  top: 88px
-  bottom: 0
-  .singer-content {
-    height: 100%
-    overflow-x: scroll;
-  }
 }
 </style>
