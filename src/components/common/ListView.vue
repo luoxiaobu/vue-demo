@@ -1,5 +1,8 @@
 <template>
-  <a-scroll class="list-view" ref="listview">
+  <a-scroll class="list-view"
+  @scroll="scroll"
+  :listen-scroll="listenScroll"
+  ref="listview">
     <ul>
       <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -12,7 +15,7 @@
       </li>
     </ul>
     <div class="side-bar" v-if="barData.length" @touchstart.stop="barTouchStart" @touchmove.stop="barTouchMove">
-      <div class="side-bar-item" v-for="(title, index) in barData" :key="index" :data-index="index">
+      <div :class="['side-bar-item',{'current':index===currentIndex}]" v-for="(title, index) in barData" :key="index" :data-index="index">
         {{title}}
       </div>
     </div>
@@ -37,7 +40,9 @@ export default {
       startClientY: 0,
       startIndex: 0,
       listHeight: [],
-      scrollY: 0
+      scrollY: 0,
+      currentIndex: 0,
+      listenScroll: true
     }
   },
   computed: {
@@ -52,6 +57,22 @@ export default {
       setTimeout(() => {
         this.calculateHeight()
       }, 20)
+    },
+    scrollY (newY) {
+      const listHeight = this.listHeight
+      if (newY <= 0) {
+        this.currentIndex = 0;
+        return
+      }
+      for (let i = 0; i < listHeight.length - 1; i++) {
+        let height1 = listHeight[i];
+        let height2 = listHeight[i + 1];
+        if (newY >= height1 && newY < height2) {
+          this.currentIndex = i;
+          return
+        }
+      }
+      this.currentIndex = this.listHeight.length - 1;
     }
   },
   methods: {
@@ -61,6 +82,7 @@ export default {
       }
       this.startClientY = ev.touches[0].clientY;
       this.startIndex = parseInt(getData(ev.target, 'index'));
+      this.scrollTo(this.startIndex);
     },
     barTouchMove (ev) {
       if (ev.cancelable) {
@@ -92,8 +114,12 @@ export default {
       } else if (index > this.listHeight.length - 1) {
         index = this.listHeight.length - 1
       }
+      this.currentIndex = index;
       this.scrollY = this.listHeight[index]
       this.$refs.listview.scrollTo(this.scrollY)
+    },
+    scroll (pos) {
+      this.scrollY = pos.y
     }
   }
 }
@@ -143,12 +169,16 @@ export default {
     background-color: transparent;
   }
   .side-bar-item {
-    padding: 3px;
-    line-height: 1;
+    height: 18px;
+    width: 18px;
+    text-align: center;
+    line-height: 18px;
     color: $color-text-gr;
     font-size: $font-size-small;
     &.current {
-      color: $color-theme;
+      border-radius: 50%;
+      color: #fff;
+      background-color:#f7d8e0;
     }
   }
 }

@@ -14,6 +14,10 @@ export default {
     },
     height: {
       type: String
+    },
+    listenScroll: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -24,7 +28,23 @@ export default {
   methods: {
     scrollTo (y) {
       this.$refs.scroll.scrollTop = y;
+    },
+    initScroll () {
+      if (this.listenScroll) {
+        let element = this.$refs.scroll;
+        element.addEventListener('scroll', this.getScrollPosition)
+      }
+    },
+    getScrollPosition (ev) {
+      let element = ev.currentTarget
+      this.$emit('scroll', {
+        y: element.scrollTop,
+        x: element.scrollLeft
+      })
     }
+  },
+  mounted () {
+    this.initScroll();
   }
 }
 </script>
