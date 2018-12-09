@@ -18,7 +18,7 @@ export function getRecommend () {
   return jsonpRequest(url, reallyData, opts)
 }
 
-export function getPlaylist (data) {
+export function getPlaylist () {
   const url = '/api/getDiscList'
   var reallyData = Object.assign({}, qqyBase, {
     picmid: 1,

@@ -1,6 +1,7 @@
 <template>
   <div class="singer">
-    <listView :data="singerList"></listView>
+    <listView :data="singerList" @select="goToDetail"></listView>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -66,6 +67,11 @@ export default {
         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
       })
       return hot.concat(ret)
+    },
+    goToDetail (item) {
+      this.$router.push({
+        path: `/singer/${item.id}`
+      })
     }
   },
   mounted () {

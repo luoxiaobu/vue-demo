@@ -7,7 +7,7 @@
       <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul class="list-group-block">
-          <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
+          <li class="list-group-item" v-for="(item, index) in group.items" :key="index" @click="selectItem(item)">
             <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -141,6 +141,9 @@ export default {
     },
     scroll (pos) {
       this.scrollY = pos.y
+    },
+    selectItem (item) {
+      this.$emit('select', item);
     }
   }
 }
@@ -178,7 +181,6 @@ export default {
   .side-bar {
     touch-action: none;
     position: absolute;
-    z-index: 30
     right: 0;
     top: 50%;
     transform: translate(0,-50%);
@@ -199,7 +201,7 @@ export default {
     &.current {
       border-radius: 50%;
       color: #fff;
-      background-color:#f7d8e0;
+      background-color: $color-pink;
     }
   }
   .list-fixed {

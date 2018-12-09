@@ -65,7 +65,6 @@ export default {
     border-left: 2px solid $color-theme;
   }
   .recommend-list {
-    background-color: #f4f4f4;
     color: $color-text-dark;
     padding-top: 20px;
     .wrap-item {
