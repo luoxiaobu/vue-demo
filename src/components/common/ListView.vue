@@ -19,12 +19,17 @@
         {{title}}
       </div>
     </div>
+    <div class="list-fixed list-group-title" ref= "fixed" v-show="fixedTitle">
+      {{fixedTitle}}
+    </div>
   </a-scroll>
 </template>
 <script>
 import AScroll from './AScroll';
 import { getData } from '@/utils/tools.js';
+import { getTranslate } from '@/utils/animation';
 const SID_ITEM_HEIGHT = 18;
+const TITLE_HEIGHT = 30;
 export default {
   components: {
     AScroll
@@ -42,7 +47,8 @@ export default {
       listHeight: [],
       scrollY: 0,
       currentIndex: 0,
-      listenScroll: true
+      listenScroll: true,
+      fixedTitleDiff: 0
     }
   },
   computed: {
@@ -50,6 +56,12 @@ export default {
       return this.data.map((group) => {
         return group.title.substr(0, 1);
       })
+    },
+    fixedTitle () {
+      if (this.scrollY <= 0) {
+        return '';
+      }
+      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : '';
     }
   },
   watch: {
@@ -69,10 +81,20 @@ export default {
         let height2 = listHeight[i + 1];
         if (newY >= height1 && newY < height2) {
           this.currentIndex = i;
+          this.fixedTitleDiff = height2 - newY
           return
         }
       }
       this.currentIndex = this.listHeight.length - 1;
+    },
+    fixedTitleDiff (newVal) {
+      let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+      // in most cases it is 0
+      if (this.fixedTop === fixedTop) {
+        return
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = getTranslate(0, `${fixedTop}px`)
     }
   },
   methods: {
@@ -114,7 +136,6 @@ export default {
       } else if (index > this.listHeight.length - 1) {
         index = this.listHeight.length - 1
       }
-      this.currentIndex = index;
       this.scrollY = this.listHeight[index]
       this.$refs.listview.scrollTo(this.scrollY)
     },
@@ -180,6 +201,12 @@ export default {
       color: #fff;
       background-color:#f7d8e0;
     }
+  }
+  .list-fixed {
+    position: absolute;
+    top: 0
+    left: 0
+    width: 100%
   }
 }
 </style>
