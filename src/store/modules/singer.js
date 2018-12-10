@@ -1,9 +1,12 @@
+import {
+  SET_SINGER
+} from '../mutation-types'
+
 const state = {
-  singer: null
+  singer: {}
 }
 
-
-// function (state, getters) 
+// function (state, getters)
 const getters = {
   getSinger: state => state.singer
 }
@@ -16,11 +19,17 @@ const mutations = {
 }
 // 与 store 实例具有相同方法和属性的 context 对象
 // function (context)
-const actions = {
-  // setSinger(context) {
-  //   context.commit(SET_SINGER)
-  // }
-  // setSinger({commit}) {
-  //   commit(SET_SINGER)
-  // }
+// const actions = {
+//   setSinger(context) {
+//     context.commit(SET_SINGER)
+//   }
+//   setSinger({commit}) {
+//     commit(SET_SINGER)
+//   }
+// }
+
+export default {
+  state,
+  getters,
+  mutations
 }

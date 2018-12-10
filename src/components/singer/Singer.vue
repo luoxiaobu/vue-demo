@@ -6,9 +6,10 @@
 </template>
 
 <script>
-import { getSingerList } from 'service/singer'
-import Singer from './singerData.js'
-import listView from '../common/ListView'
+import { getSingerList } from 'service/singer';
+import Singer from './singerData.js';
+import listView from '../common/ListView';
+import { mapMutations } from 'vuex';
 
 const HOT_SINGER_NUM = 10;
 const HOT_NAME = 'hot'
@@ -22,6 +23,9 @@ export default {
     listView
   },
   methods: {
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
     getSingerList () {
       getSingerList().then((data) => {
         this.singerList = this.normalizeSinger(data.list);
@@ -69,12 +73,13 @@ export default {
       return hot.concat(ret)
     },
     goToDetail (item) {
+      this.setSinger(item);
       this.$router.push({
         path: `/singer/${item.id}`
       })
     }
   },
-  mounted () {
+  created () {
     this.getSingerList();
   }
 }

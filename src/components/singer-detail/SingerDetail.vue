@@ -6,6 +6,29 @@
   </transition>
 </template>
 <script type="text/javascript">
+import { mapGetters } from 'vuex';
+import { getSingerDetail } from 'service/singer'
+export default {
+  computed: {
+    ...mapGetters(['getSinger'])
+  },
+  methods: {
+    getSingerDetail () {
+      let { id } = this.getSinger
+      if (!id) {
+        this.$router.push('/singer');
+      }
+      getSingerDetail(id).then((data) => {
+        console.log(data);
+      }).catch(() => {
+
+      })
+    }
+  },
+  created () {
+    this.getSingerDetail();
+  }
+}
 </script>
 <style scoped lang="stylus">
 @import "../../themes/variable"

@@ -46,7 +46,7 @@ export default {
       }).catch(() => {})
     }
   },
-  mounted () {
+  created () {
     this.getRecommend();
     this.getPlaylist();
   }
