@@ -22,8 +22,6 @@ export function getPlaylist () {
   const url = '/api/getDiscList'
   var reallyData = Object.assign({}, qqyBase, {
     picmid: 1,
-    platform: 'yqq',
-    hostUin: 0,
     sin: 0,
     ein: 29,
     sortId: 5,

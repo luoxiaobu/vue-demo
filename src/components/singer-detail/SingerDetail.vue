@@ -8,7 +8,13 @@
 <script type="text/javascript">
 import { mapGetters } from 'vuex';
 import { getSingerDetail } from 'service/singer'
+import { createSong } from './song'
 export default {
+  data () {
+    return {
+      songList: []
+    }
+  },
   computed: {
     ...mapGetters(['getSinger'])
   },
@@ -19,10 +25,21 @@ export default {
         this.$router.push('/singer');
       }
       getSingerDetail(id).then((data) => {
-        console.log(data);
+        this.songList = this.normalizeSongs(data.list);
+        console.log(this.songList);
       }).catch(() => {
 
       })
+    },
+    normalizeSongs (list) {
+      let ret = []
+      list.forEach((item) => {
+        let {musicData} = item
+        if (musicData.songid && musicData.albummid) {
+          ret.push(createSong(musicData))
+        }
+      })
+      return ret
     }
   },
   created () {

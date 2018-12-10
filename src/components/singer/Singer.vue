@@ -7,7 +7,7 @@
 
 <script>
 import { getSingerList } from 'service/singer';
-import Singer from './singerData.js';
+import Singer from './singer.js';
 import listView from '../common/ListView';
 import { mapMutations } from 'vuex';
 
