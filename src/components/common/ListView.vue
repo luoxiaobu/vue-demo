@@ -136,8 +136,7 @@ export default {
       } else if (index > this.listHeight.length - 1) {
         index = this.listHeight.length - 1
       }
-      this.scrollY = this.listHeight[index]
-      this.$refs.listview.scrollTo(this.scrollY)
+      this.$refs.listview.scrollTo(this.listHeight[index])
     },
     scroll (pos) {
       this.scrollY = pos.y
