@@ -1,32 +1,49 @@
 <template>
   <transition name="slide">
     <div class="singer-detail">
-      singerdetail
+      <music-list :title="title" :bg-image="bgImage" :songs="songList"></music-list>
     </div>
   </transition>
 </template>
 <script type="text/javascript">
-import { mapGetters } from 'vuex';
-import { getSingerDetail } from 'service/singer'
-import { createSong } from './song'
+import { mapGetters, mapMutations } from 'vuex';
+import { getSingerDetail } from 'service/singer';
+import musicList from '../music-list/MusicList'
+import Singer from '../singer/singerData.js';
+import { createSong } from './song';
 export default {
   data () {
     return {
       songList: []
     }
   },
+  components: {
+    musicList
+  },
   computed: {
-    ...mapGetters(['getSinger'])
+    ...mapGetters(['getSinger']),
+    title () {
+      return this.getSinger.name;
+    },
+    bgImage () {
+      return this.getSinger.avatar;
+    }
   },
   methods: {
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
     getSingerDetail () {
-      let { id } = this.getSinger
+      let id = this.getSinger.id || (this.$route.params && this.$route.params.id)
       if (!id) {
         this.$router.push('/singer');
       }
       getSingerDetail(id).then((data) => {
+        this.setSinger(new Singer({
+          name: data.singer_name,
+          id: data.singer_mid
+        }))
         this.songList = this.normalizeSongs(data.list);
-        console.log(this.songList);
       }).catch(() => {
 
       })
