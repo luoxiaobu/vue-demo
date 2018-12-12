@@ -1,7 +1,7 @@
 <template>
   <div class="scroll-wrap" :style="{top:positionTop}">
     <div class="scroll" ref="scroll">
-      <slot class="scroll"></slot>
+      <slot></slot>
     </div>
   </div>
 </template>
@@ -56,7 +56,8 @@ export default {
   overflow: hidden;
   .scroll {
     height: 100%
-    overflow-x: scroll;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
   }
 }
 </style>
