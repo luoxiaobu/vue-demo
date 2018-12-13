@@ -1,26 +1,24 @@
 <template>
   <div class="music-list">
-    <div class="ban-back white" @click.stop="back" ref="back">
-      <div class="left-botton">
-        <div class="back-arrow"></div>
-        <div class="left-title">返回</div>
-      </div>
-    </div>
-    <div class="ban-back dark">
-      <div class="left-botton">
-        <div class="back-arrow"></div>
-        <div class="left-title">返回</div>
-      </div>
-      <h1 class="title" v-html="title"></h1>
-    </div>
-    <a-scroll :top="imageHeight" class="list">
-      <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
-      <div class="scroll-content">
-        <div class="bg-image bg-layer" ref="layer"></div>
-        <div class="song-wrapper">
-          <song-list :songs="songs" @select="selectItem"></song-list>
+    <transition>
+      <div class="ban-back white" @click.stop="back" ref="back" v-if="showLight">
+        <div class="left-botton">
+          <div class="back-arrow"></div>
+          <div class="left-title">返回</div>
         </div>
       </div>
+      <div v-else class="ban-back dark">
+        <div class="left-botton">
+          <div class="back-arrow"></div>
+          <div class="left-title">返回</div>
+        </div>
+        <h1 class="title" v-html="title"></h1>
+      </div>
+    </transition>
+    <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
+    <a-scroll :top="scrollHeight" @scroll="scroll" :listen-scroll="listenScroll">
+      <div :style="layerStyle" ref="layer"></div>
+      <song-list class="song-wrapper" :songs="songs" @select="selectItem"></song-list>
     </a-scroll>
   </div>
 </template>
@@ -30,7 +28,11 @@ import songList from 'components/common/SongList';
 export default {
   data () {
     return {
-      imageHeight: '0px'
+      layerHeight: '0px',
+      scrollHeight: '0px',
+      scrollY: 0,
+      listenScroll: true,
+      showLight: true
     }
   },
   props: {
@@ -53,16 +55,39 @@ export default {
   computed: {
     bgStyle () {
       return `background-image:url(${this.bgImage})`
+    },
+    layerStyle () {
+      return `height:${this.layerHeight}px`
+    }
+  },
+  watch: {
+    scrollY (newY) {
+      let showStatus = newY <= this.layerHeight;
+      if (showStatus === this.showLight) {
+        return;
+      }
+      this.showLight = showStatus
     }
   },
   methods: {
     selectItem () {},
     back () {
       this.$router.back()
+    },
+    scroll (pos) {
+      console.log(pos)
+      this.scrollY = pos.y
+    },
+    initView () {
+      if (this.$refs.back && this.$refs.bgImage) {
+        this.scrollHeight = `${this.$refs.back.clientHeight}px`;
+        this.layerHeight = `${this.$refs.bgImage.clientHeight - this.$refs.back.clientHeight}`;
+        console.log(this.layerHeight)
+      }
     }
   },
   mounted () {
-    // this.imageHeight = `${this.$refs.back.clientHeight}px`
+    this.initView()
   }
 }
 </script>
@@ -87,10 +112,7 @@ export default {
       font-size: $font-size-medium-x;
       color: $color-text-d;
     }
-    &.white {
-    }
     &.dark {
-      display: none;
       text-align: center;
       background: $color-highlight-background;
     }
@@ -123,29 +145,16 @@ export default {
       border-left: 1px solid $color-text-d;
     }
   }
-  .white {
-    .back-arrow {
-    }
+  .bg-image {
+    width: 100%;
+    padding-top: 70%;
+    height: 0
+    background-size: cover;
+    position: absolute;
   }
-  .list {
-    overflow: visible;
-    .bg-image {
-      width: 100%;
-      padding-top: 70%;
-      height: 0
-      background-size: cover;
-      position: absolute;
-    }
-    .bg-layer {
-      position: relative
-    }
-    .song-wrapper {
-      padding: 20px 30px;
-    }
-    .scroll-content {
-      position: relative;
-      z-index: 1;
-    }
+  .song-wrapper {
+    background-color: $background-color-theme;
+    padding: 20px 30px;
   }
 }
 </style>
