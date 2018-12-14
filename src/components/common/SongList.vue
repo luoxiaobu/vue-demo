@@ -1,7 +1,7 @@
 <template>
   <div class="song-list">
     <ul>
-      <li @click="selectItem(displaySongs, index)" class="item" v-for="(song, index) in displaySongs" :key ="song.id">
+      <li @click="selectItem(song, index)" class="item" v-for="(song, index) in displaySongs" :key ="song.id">
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{song.displaySong}}</p>

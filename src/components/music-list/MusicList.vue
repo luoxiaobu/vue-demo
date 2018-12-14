@@ -1,13 +1,13 @@
 <template>
   <div class="music-list">
-    <transition>
-      <div class="ban-back white" @click.stop="back" ref="back" v-if="showLight">
+    <transition name="show">
+      <div class="ban-back white" @click.stop="back" ref="back" v-if="showLight" key="white">
         <div class="left-botton">
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
       </div>
-      <div v-else class="ban-back dark">
+      <div v-else class="ban-back dark" @click.stop="back" key="dark">
         <div class="left-botton">
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
@@ -25,6 +25,7 @@
 <script>
 import aScroll from 'components/common/AScroll';
 import songList from 'components/common/SongList';
+import { getplaysongvkey } from 'service/song'
 export default {
   data () {
     return {
@@ -70,19 +71,22 @@ export default {
     }
   },
   methods: {
-    selectItem () {},
+    selectItem (item, index) {
+      var songMid = item.mid;
+      getplaysongvkey(songMid).then((data) => {
+        console.log(data)
+      })
+    },
     back () {
       this.$router.back()
     },
     scroll (pos) {
-      console.log(pos)
       this.scrollY = pos.y
     },
     initView () {
       if (this.$refs.back && this.$refs.bgImage) {
         this.scrollHeight = `${this.$refs.back.clientHeight}px`;
         this.layerHeight = `${this.$refs.bgImage.clientHeight - this.$refs.back.clientHeight}`;
-        console.log(this.layerHeight)
       }
     }
   },
@@ -108,41 +112,39 @@ export default {
     line-height: 40px;
     height: 40px;
     z-index: 2;
-    .title {
-      font-size: $font-size-medium-x;
-      color: $color-text-d;
-    }
-    &.dark {
-      text-align: center;
-      background: $color-highlight-background;
-    }
     .left-botton {
       position: absolute;
-      .left-title {
-        font-size: $font-size-medium;
-        display: inline-block;
-        vertical-align: middle;
-        color: $color-pink;
-      }
-      .back-arrow {
-        width: 10px;
-        height: 10px;
-        transform: rotate(-45deg);
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 10px;
-        border-top: 1px solid $color-pink;
-        border-left: 1px solid $color-pink;
-      }
+    }
+    .left-title {
+      font-size: $font-size-medium;
+      display: inline-block;
+      vertical-align: middle;
+      color: $color-pink;
+    }
+    .back-arrow {
+      width: 10px;
+      height: 10px;
+      transform: rotate(-45deg);
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 10px;
+      border-top: 1px solid $color-pink;
+      border-left: 1px solid $color-pink;
     }
   }
   .dark {
+    text-align: center;
+    background: $color-highlight-background;
     .left-title {
       color: $color-text-d;
     }
     .back-arrow {
       border-top: 1px solid $color-text-d;
       border-left: 1px solid $color-text-d;
+    }
+    .title {
+      font-size: $font-size-medium-x;
+      color: $color-text-d;
     }
   }
   .bg-image {
@@ -155,6 +157,12 @@ export default {
   .song-wrapper {
     background-color: $background-color-theme;
     padding: 20px 30px;
+  }
+  .show-enter-active, .show-leave-active {
+    transition: opacity 0.3s;
+  }
+  .show-enter, .show-leave-to {
+    opacity: 0;
   }
 }
 </style>

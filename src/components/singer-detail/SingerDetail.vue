@@ -20,6 +20,11 @@ export default {
   components: {
     musicList
   },
+  props: {
+    id: {
+      type: String
+    }
+  },
   computed: {
     ...mapGetters(['getSinger']),
     title () {
@@ -34,7 +39,7 @@ export default {
       setSinger: 'SET_SINGER'
     }),
     getSingerDetail () {
-      let id = this.getSinger.id || (this.$route.params && this.$route.params.id)
+      let id = this.getSinger.id || (this.id)
       if (!id) {
         this.$router.push('/singer');
       }

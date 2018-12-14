@@ -20,7 +20,8 @@ export default new Router({
     component: Singer,
     children: [{
       path: ':id',
-      component: SingerDetail
+      component: SingerDetail,
+      props: true // 使用 props 将组件和路由解耦, 如果 props 被设置为 true，route.params 将会被设置为组件属性
     }]
   }, {
     path: '/rank',

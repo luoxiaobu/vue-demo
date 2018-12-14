@@ -1,4 +1,4 @@
-import { jsonpRequest } from '../utils/jsonpRequest'
+import { jsonpRequest } from '@/utils/jsonpRequest'
 import { qqyBase } from './config'
 
 export function getSingerList () {
