@@ -2,20 +2,25 @@
   <div class="music-list">
     <transition name="show">
       <div class="ban-back white" @click.stop="back" ref="back" v-if="showLight" key="white">
-        <div class="left-botton">
+        <div class="left-button">
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
       </div>
       <div v-else class="ban-back dark" @click.stop="back" key="dark">
-        <div class="left-botton">
+        <div class="left-button">
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
         <h1 class="title" v-html="title"></h1>
       </div>
     </transition>
-    <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div v-show="songs.length>0" class="play-button">
+        <i class="icon-play"></i>
+        <span class="text">随机播放全部</span>
+      </div>
+    </div>
     <a-scroll :top="scrollHeight" @scroll="scroll" :listen-scroll="listenScroll">
       <div :style="layerStyle" ref="layer"></div>
       <song-list class="song-wrapper" :songs="songs" @select="selectItem"></song-list>
@@ -112,7 +117,7 @@ export default {
     line-height: 40px;
     height: 40px;
     z-index: 2;
-    .left-botton {
+    .left-button {
       position: absolute;
     }
     .left-title {
@@ -153,6 +158,29 @@ export default {
     height: 0
     background-size: cover;
     position: absolute;
+  }
+  .play-button {
+    position: absolute;
+    bottom: 20px;
+    width: 135px;
+    padding: 7px 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    text-align: center
+    border: 1px solid $color-pink;
+    color: $color-pink;
+    border-radius: 100px
+    .icon-play {
+      display: inline-block
+      vertical-align: middle
+      margin-right: 6px
+      font-size: $font-size-medium-x
+    }
+    .text {
+      display: inline-block
+      vertical-align: middle
+      font-size: $font-size-small
+    }
   }
   .song-wrapper {
     background-color: $background-color-theme;

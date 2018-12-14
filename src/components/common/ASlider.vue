@@ -183,7 +183,6 @@ export default {
       }
       if (ev.cancelable) {
         ev.preventDefault();
-        ev.stopPropagation();
       }
       const diff = ev.touches[0].clientX - this.startClientX;
       if (Math.abs(diff) < moveThreshold) {
