@@ -1,5 +1,5 @@
-import { jsonpRequest } from '../utils/jsonpRequest'
-import { axiosRequest } from '../utils/axiosRequest'
+import { jsonpRequest } from '@/utils/jsonpRequest'
+import { axiosRequest } from '@/utils/axiosRequest'
 import { qqyBase } from './config'
 
 const requestIns = axiosRequest();
