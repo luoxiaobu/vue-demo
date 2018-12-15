@@ -18,6 +18,7 @@ const mutations = {
   }
 }
 // 与 store 实例具有相同方法和属性的 context 对象
+// 对 mutation 的封装 和异步操作
 // function (context)
 // const actions = {
 //   setSinger(context) {
