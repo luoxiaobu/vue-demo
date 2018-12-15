@@ -72,6 +72,7 @@ export default {
 <style scoped lang="stylus">
 @import "../../themes/variable"
 .singer-detail {
+  z-index: 2;
   position: fixed;
   top: 0;
   left: 0;

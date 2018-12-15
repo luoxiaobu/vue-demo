@@ -104,7 +104,7 @@ export default {
 <style lang="stylus">
 @import "../../themes/variable"
 .music-list {
-  position: fixed
+  position: absolute;
   top: 0
   left: 0
   bottom: 0
@@ -171,10 +171,10 @@ export default {
     color: $color-pink;
     border-radius: 100px
     .icon-play {
-      display: inline-block
-      vertical-align: middle
-      margin-right: 6px
-      font-size: $font-size-medium-x
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+      font-size: $font-size-medium-x;
     }
     .text {
       display: inline-block
