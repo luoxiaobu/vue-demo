@@ -21,7 +21,7 @@
         <span class="text">随机播放全部</span>
       </div>
     </div>
-    <a-scroll :top="scrollHeight" @scroll="scroll" :listen-scroll="listenScroll">
+    <a-scroll :top="scrollHeight" @pull="pull" :listen-pull="listenPull" @scroll="scroll" :listen-scroll="listenScroll">
       <div :style="layerStyle" ref="layer"></div>
       <song-list class="song-wrapper" :songs="songs" @select="selectItem"></song-list>
     </a-scroll>
@@ -30,15 +30,21 @@
 <script>
 import aScroll from 'components/common/AScroll';
 import songList from 'components/common/SongList';
-import { getplaysongvkey } from 'service/song'
+import { getplaysongvkey } from 'service/song';
+import { prefixStyle } from '@/utils/tools.js';
+const transform = prefixStyle('transform')
 export default {
   data () {
     return {
       layerHeight: '0px',
-      scrollHeight: '0px',
+      imageHeight: '0px',
       scrollY: 0,
       listenScroll: true,
-      showLight: true
+      listenPull: true,
+      showLight: true,
+      translateY: 0,
+      scale: 1,
+      scrollHeight: '0px'
     }
   },
   props: {
@@ -73,6 +79,18 @@ export default {
         return;
       }
       this.showLight = showStatus
+    },
+    translateY (newVal) {
+      let scale = 1
+      const percent = Math.abs(newVal / this.imageHeight)
+      if (newVal > 0) {
+        scale = 1 + percent
+      }
+      if (this.scale === scale) {
+        return;
+      }
+      this.scale = scale
+      this.$refs.bgImage.style[transform] = `scale(${scale})`
     }
   },
   methods: {
@@ -88,10 +106,14 @@ export default {
     scroll (pos) {
       this.scrollY = pos.y
     },
+    pull (translateY) {
+      this.translateY = translateY;
+    },
     initView () {
       if (this.$refs.back && this.$refs.bgImage) {
+        this.imageHeight = this.$refs.bgImage.clientHeight;
         this.scrollHeight = `${this.$refs.back.clientHeight}px`;
-        this.layerHeight = `${this.$refs.bgImage.clientHeight - this.$refs.back.clientHeight}`;
+        this.layerHeight = `${this.imageHeight - this.$refs.back.clientHeight}`;
       }
     }
   },
@@ -158,6 +180,10 @@ export default {
     height: 0
     background-size: cover;
     position: absolute;
+    /*
+    *  attention
+    */
+    transform-origin: top;
   }
   .play-button {
     position: absolute;
