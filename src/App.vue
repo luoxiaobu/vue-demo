@@ -7,17 +7,19 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
+    <a-player></a-player>
   </div>
 </template>
 
 <script>
-import AHeader from './components/a-header/AHeader'
-import ATab from './components/a-tab/ATab'
+import AHeader from 'components/a-header/AHeader'
+import ATab from 'components/a-tab/ATab'
+import APlayer from 'components/a-player/APlayer'
 
 export default {
   name: 'App',
   components: {
-    AHeader, ATab
+    AHeader, ATab, APlayer
   }
 }
 </script>
