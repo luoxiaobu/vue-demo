@@ -4,3 +4,14 @@ no-wrap(){
   overflow: hidden;
   white-space: nowrap;
 }
+
+normal-arrow($color,$rotate) {
+  width: 10px;
+  height: 10px;
+  transform: rotate($rotate);
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  border-top: 1px solid $color;
+  border-left: 1px solid $color;
+}

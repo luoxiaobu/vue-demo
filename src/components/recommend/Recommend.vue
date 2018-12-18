@@ -9,8 +9,8 @@
             <img width="70" height="70" v-lazy="item.imgurl">
           </div>
           <div class="text flexbox">
-            <h2 class="name text-ellipsis">{{item.creator.name}}</h2>
-            <p class="desc text-ellipsis">{{item.dissname}}</p>
+            <h2 class="name">{{item.creator.name}}</h2>
+            <p class="desc">{{item.dissname}}</p>
           </div>
           <div class="item-arrow">
           </div>
@@ -55,6 +55,7 @@ export default {
 
 <style lang="stylus">
 @import "../../themes/variable"
+@import "../../themes/mixin"
 .recommend {
   .list-title {
     padding-left: 9px;
@@ -97,10 +98,12 @@ export default {
       padding-right: 20px
     }
     .name {
-      margin-bottom: 10px
+      margin-bottom: 10px;
+      no-wrap()
     }
     .desc {
-      color: $color-text-d
+      color: $color-text-d;
+      no-wrap()
     }
   }
 }
