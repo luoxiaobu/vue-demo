@@ -208,7 +208,7 @@ export default {
   }
   .song-wrapper {
     background-color: $background-color-theme;
-    padding: 20px 30px;
+    padding: 20px 20px;
   }
   .show-enter-active, .show-leave-active {
     transition: opacity 0.3s;

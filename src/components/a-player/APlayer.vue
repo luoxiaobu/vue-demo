@@ -19,6 +19,9 @@
         </div>
         <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
       </div>
+      <div class="normal-player-middle">
+        
+      </div>
     </div>
     <div class="mini-player" v-if="showMode === SHOW_MODE.MINI" @click.stop="showPlay(SHOW_MODE.NORMAL)">mini-player</div>
   </div>
@@ -71,7 +74,7 @@ export default {
       width: 100%;
       height: 100%;
       z-index: -1;
-      filter: blur(30px);
+      filter: blur(20px);
       opacity: 0.6;
     }
   }
@@ -128,6 +131,19 @@ export default {
       }
     }
   }
+  .normal-player-middle {
+    position: absolute;
+    width: 100%
+    top: 80px
+    bottom: 170px
+  }
+  .mini-player {
+    position: fixed
+    left: 0
+    bottom: 0
+    z-index: 180
+    width: 100%
+    height: 60px
+  }
 }
-
 </style>
