@@ -22,13 +22,14 @@
       <div class="normal-player-middle">
         <div class="play-card">
           <div class="song-rollwrap">
-            <img :class="['play',playStatus,'singer-card']" width="100%" height="100%" v-lazy="currentSong.image">
+            <img :class="[playStatus,'singer-card']" width="100%" height="100%" v-lazy="currentSong.image">
           </div>
           <div class="play-button" @click.stop="stopPlay()">
             <div class="play-icon" v-show="playing"></div>
           </div>
         </div>
       </div>
+      <div class="normal-player-bottom"></div>
     </div>
     <div class="mini-player" v-if="showMode === SHOW_MODE.MINI" @click.stop="showPlay(SHOW_MODE.NORMAL)">mini-player</div>
   </div>
@@ -51,7 +52,7 @@ export default {
       'currentSong'
     ]),
     playStatus () {
-      return this.playing ? '' : 'pause';
+      return this.playing ? 'play' : 'play pause';
     }
   },
   methods: {
@@ -132,28 +133,11 @@ export default {
       }
     }
   }
-  .hidden-player {
-    position: absolute;
-    right: 0;
-    top: 7px;
-    z-index: 10;
-    .icon-move {
-      display: inline-block;
-      vertical-align: middle;
-      height: 30px;
-      width: 30px;
-      background: url(../../assets/move.png) no-repeat;
-      background-size: cover;
-      &.move {
-        background-image: url(../../assets/move1.gif);
-      }
-    }
-  }
   .normal-player-middle {
     position: absolute;
     width: 100%;
     top: 80px;
-    bottom: 170px;
+    bottom: 160px;
     .play-card {
       position: relative;
       margin: 0 auto;
@@ -188,6 +172,26 @@ export default {
       }
     }
   }
+  .normal-player-bottom {
+
+  }
+  .hidden-player {
+    position: absolute;
+    right: 0;
+    top: 7px;
+    z-index: 10;
+    .icon-move {
+      display: inline-block;
+      vertical-align: middle;
+      height: 30px;
+      width: 30px;
+      background: url(../../assets/move.png) no-repeat;
+      background-size: cover;
+      &.move {
+        background-image: url(../../assets/move1.gif);
+      }
+    }
+  }
   .mini-player {
     position: absolute
     left: 0
@@ -207,13 +211,17 @@ export default {
 }
 
 @media screen and (min-width: 360px) {
-  .play-card {
-    width: 296px;
-    height: 296px;
-  }
-  .song-rollwrap {
-    width: 184px;
-    height: 184px;
+  .a-player  {
+    .normal-player-middle {
+      .play-card {
+        width: 296px;
+        height: 296px;
+      }
+      .song-rollwrap {
+        width: 184px;
+        height: 184px;
+      }
+    }
   }
 }
 </style>
