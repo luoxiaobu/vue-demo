@@ -6,7 +6,7 @@
     </div>
     <div class="normal-player" v-if="showMode === SHOW_MODE.NORMAL">
       <div class="background">
-        <img width="100%" height="100%" :src="currentSong.image">
+        <img width="100%" height="100%" v-lazy="currentSong.image">
       </div>
       <div class="normal-player-top">
         <div class="left-button" @click.stop="showPlay(SHOW_MODE.HIDDEN)">
@@ -20,7 +20,14 @@
         <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
       </div>
       <div class="normal-player-middle">
-        
+        <div class="play-card">
+          <div class="song-rollwrap">
+            <img :class="['play',playStatus,'singer-card']" width="100%" height="100%" v-lazy="currentSong.image">
+          </div>
+          <div class="play-button" @click.stop="stopPlay()">
+            <div class="play-icon" v-show="playing"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="mini-player" v-if="showMode === SHOW_MODE.MINI" @click.stop="showPlay(SHOW_MODE.NORMAL)">mini-player</div>
@@ -42,14 +49,21 @@ export default {
       'showMode',
       'playing',
       'currentSong'
-    ])
+    ]),
+    playStatus () {
+      return this.playing ? '' : 'pause';
+    }
   },
   methods: {
     ...mapMutations({
-      setShowMode: 'SET_SHOW_MODE'
+      setShowMode: 'SET_SHOW_MODE',
+      seyPlaying: 'SET_PLAYING'
     }),
     showPlay (mode) {
       this.setShowMode(mode)
+    },
+    stopPlay () {
+      this.seyPlaying(!this.playing);
     }
   }
 }
@@ -60,7 +74,7 @@ export default {
 @import "../../themes/mixin"
 .a-player {
   .normal-player {
-    background-color: $background-color-theme;
+    background-color: #6d6d6d;
     position: fixed;
     left: 0;
     right: 0;
@@ -84,6 +98,7 @@ export default {
     margin-bottom: 25px;
     color: $color-text-light;
     .left-button {
+      width: 60px;
       .left-title {
         font-size: $font-size-medium;
         display: inline-block;
@@ -94,8 +109,10 @@ export default {
       }
     }
     .right-button {
+      width: 60px;
       color: $color-pink;
       padding-right: 8px;
+      text-align: center;
     }
     .normal-player-title {
       height: $bar-height;
@@ -116,34 +133,87 @@ export default {
     }
   }
   .hidden-player {
-    position: fixed;
+    position: absolute;
     right: 0;
-    top: 2px;
+    top: 7px;
     z-index: 10;
     .icon-move {
       display: inline-block;
       vertical-align: middle;
-      height: $bar-height;
-      width: $bar-height;
+      height: 30px;
+      width: 30px;
       background: url(../../assets/move.png) no-repeat;
+      background-size: cover;
       &.move {
-        background: url(../../assets/move1.gif) no-repeat;
+        background-image: url(../../assets/move1.gif);
       }
     }
   }
   .normal-player-middle {
     position: absolute;
-    width: 100%
-    top: 80px
-    bottom: 170px
+    width: 100%;
+    top: 80px;
+    bottom: 170px;
+    .play-card {
+      position: relative;
+      margin: 0 auto;
+      background-color: rgba(30,30,30,0.2);
+      border-radius: 100%;
+      width: 248px;
+      height: 248px;
+    }
+    .song-rollwrap {
+      position-center(relative);
+      width: 150px;
+      height: 150px;
+    }
+    .singer-card {
+      border-radius: 100%;
+      &.play {
+        animation: circling 20s infinite linear;
+      }
+      &.pause {
+        animation-play-state: paused
+      }
+    }
+    .play-button {
+      position-center(absolute);
+      height: 40px;
+      width: 40px;
+      .play-icon {
+        width: 100%;
+        height: 100%;
+        background: url("../../assets/play.png");
+        background-size: cover;
+      }
+    }
   }
   .mini-player {
-    position: fixed
+    position: absolute
     left: 0
     bottom: 0
     z-index: 180
     width: 100%
     height: 60px
+  }
+  @keyframes circling {
+    0% {
+      transform: rotate(0)
+    }
+    100% {
+      transform: rotate(360deg)
+    }
+  }
+}
+
+@media screen and (min-width: 360px) {
+  .play-card {
+    width: 296px;
+    height: 296px;
+  }
+  .song-rollwrap {
+    width: 184px;
+    height: 184px;
   }
 }
 </style>
