@@ -5,6 +5,7 @@
       <i class="icon-move move" v-if="playing"></i>
     </div>
     <transition name="normal"
+    @before-enter="beforeEnter"
     @enter="enter"
     @after-enter="afterEnter"
     @leave="leave"
@@ -81,7 +82,6 @@ import { mapGetters, mapMutations } from 'vuex';
 import { SHOW_MODE } from '@/data/consts';
 import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
-import animations from 'create-keyframe-animation'
 const transform = prefixStyle('transform')
 const transition = prefixStyle('transition')
 export default {
@@ -116,34 +116,20 @@ export default {
     stopPlay () {
       this.seyPlaying(!this.playing);
     },
+    beforeEnter: function (el) {
+      const {x, y, scale} = this._getPosAndScale();
+      this.$refs.cdWrapper.style[transform] = `${getTranslate(`${x}px`, `${y}px`, 0)} scale(${scale})`
+    },
     enter (el, done) {
-      const {x, y, scale} = this._getPosAndScale()
-
-      let animation = {
-        0: {
-          transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
-        },
-        60: {
-          transform: `translate3d(0,0,0) scale(1.1)`
-        },
-        100: {
-          transform: `translate3d(0,0,0) scale(1)`
-        }
-      }
-      animations.registerAnimation({
-        name: 'move',
-        animation,
-        presets: {
-          duration: 400,
-          easing: 'linear'
-        }
-      })
-
-      animations.runAnimation(this.$refs.cdWrapper, 'move', done)
+      this.$refs.cdWrapper.style[transition] = 'all 0.4s';
+      // 强制动画刷新？
+      this._getPosAndScale();
+      this.$refs.cdWrapper.style[transform] = `${getTranslate(`${0}px`, `${0}px`, 0)} scale(1)`
+      this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
     },
     afterEnter () {
-      animations.unregisterAnimation('move')
-      this.$refs.cdWrapper.style.animation = ''
+      this.$refs.cdWrapper.style[transition] = ''
+      this.$refs.cdWrapper.style[transform] = ''
     },
     leave (el, done) {
       this.$refs.cdWrapper.style[transition] = 'all 0.4s'
