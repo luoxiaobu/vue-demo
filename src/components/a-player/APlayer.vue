@@ -30,8 +30,8 @@
             <div class="song-rollwrap">
               <img :class="[playStatus,'singer-card']" width="100%" height="100%" v-lazy="currentSong.image">
             </div>
-            <div class="play-button" @click.stop="stopPlay()">
-              <div class="play-icon" v-show="playing"></div>
+            <div class="play-button" @click.stop="togglePlaying()">
+              <i class="icon-play-mini" v-show="!playing"></i>
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon" :class="disableCls">
-              <i class="icon-play i-center"></i>
+              <i @click="togglePlaying" :class="[playIcon, 'i-center']"></i>
             </div>
             <div class="icon" :class="disableCls">
               <i class="icon-next"></i>
@@ -69,6 +69,7 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -103,6 +104,12 @@ export default {
     },
     disableCls () {
       return this.songReady ? '' : 'disable'
+    },
+    miniIcon() {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play'
     }
   },
   methods: {
@@ -113,7 +120,7 @@ export default {
     showPlay (mode) {
       this.setShowMode(mode)
     },
-    stopPlay () {
+    togglePlaying () {
       this.seyPlaying(!this.playing);
     },
     beforeEnter: function (el) {
@@ -138,8 +145,8 @@ export default {
       this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
     },
     afterLeave () {
-      this.$refs.cdWrapper.style[transition] = ''
-      this.$refs.cdWrapper.style[transform] = ''
+      this.$refs.cdWrapper && (this.$refs.cdWrapper.style[transition] = '')
+      this.$refs.cdWrapper && (this.$refs.cdWrapper.style[transform] = '')
     },
     _getPosAndScale () {
       const targetWidth = 40
@@ -254,11 +261,10 @@ export default {
       position-center(absolute);
       height: 40px;
       width: 40px;
-      .play-icon {
-        width: 100%;
-        height: 100%;
-        background: url("../../assets/play.png");
-        background-size: cover;
+      z-index: 1;
+      color: $color-pink;
+      .icon-play-mini {
+        font-size: 40px;
       }
     }
   }
@@ -349,7 +355,7 @@ export default {
     .control {
       width: 50px;
       padding: 0 10px;
-      .icon-playlist {
+      i {
         font-size: 30px;
         color: $color-pink;
       }
