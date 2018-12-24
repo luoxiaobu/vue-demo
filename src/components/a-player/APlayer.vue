@@ -62,7 +62,7 @@
           <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="icon">
-          <img width="40" height="40" :src="currentSong.image">
+          <img :class="[playStatus,'singer-card']" width="40" height="40" :src="currentSong.image">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -76,6 +76,7 @@
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url"></audio>
   </div>
 </template>
 <script>
@@ -88,7 +89,8 @@ const transition = prefixStyle('transition')
 export default {
   data () {
     return {
-      SHOW_MODE
+      SHOW_MODE,
+      songReady: false
     }
   },
   computed: {
@@ -105,11 +107,24 @@ export default {
     disableCls () {
       return this.songReady ? '' : 'disable'
     },
-    miniIcon() {
+    miniIcon () {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
     },
-    playIcon() {
+    playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
+    }
+  },
+  watch: {
+    currentSong () {
+      this.$nextTick(() => {
+        this.$refs.audio.play()
+      })
+    },
+    playing (newPlaying) {
+      const audio = this.$refs.audio;
+      this.$nextTick(() => {
+        newPlaying ? audio.play() : audio.pause();
+      })
     }
   },
   methods: {
@@ -181,6 +196,15 @@ export default {
     filter: blur(20px);
     opacity: 0.6;
   }
+  .singer-card {
+    border-radius: 100%;
+    &.play {
+      animation: circling 20s infinite linear;
+    }
+    &.pause {
+      animation-play-state: paused
+    }
+  }
   .normal-player {
     background-color: #6d6d6d;
     position: fixed;
@@ -248,15 +272,6 @@ export default {
       width: 150px;
       height: 150px;
     }
-    .singer-card {
-      border-radius: 100%;
-      &.play {
-        animation: circling 20s infinite linear;
-      }
-      &.pause {
-        animation-play-state: paused
-      }
-    }
     .play-button {
       position-center(absolute);
       height: 40px;
@@ -280,7 +295,7 @@ export default {
     .icon {
       color: $color-pink;
       &.disable {
-        color: $color-theme-d
+        color: $color-text-gr
       }
       i {
         font-size: 30px;
@@ -323,15 +338,6 @@ export default {
     .icon {
       width: 80px
       padding: 0 10px 0 20px
-    }
-    img {
-      border-radius: 50%
-      &.play {
-        animation: circling 20s infinite linear;
-      }
-      &.pause {
-        animation-play-state: paused
-      }
     }
     .text {
       display: flex;
