@@ -98,7 +98,7 @@ export default {
       padding-right: 20px
     }
     .name {
-      margin-bottom: 10px
+      margin-bottom: 10px;
       no-wrap()
     }
     .desc {

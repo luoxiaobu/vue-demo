@@ -8,6 +8,7 @@
 <script type="text/javascript">
 import { mapGetters, mapMutations } from 'vuex';
 import { getSingerDetail } from 'service/singer';
+import { getplaysongvkey } from 'service/song';
 import musicList from '../music-list/MusicList'
 import Singer from '../singer/singerData.js';
 import { createSong } from './song';
@@ -48,20 +49,45 @@ export default {
           name: data.singer_name,
           id: data.singer_mid
         }))
-        this.songList = this.normalizeSongs(data.list);
+        this.normalizeSongs(data.list)
       }).catch(() => {
 
       })
     },
     normalizeSongs (list) {
-      let ret = []
+      let ret = [];
+      let songMids = [];
+      var keyinfo = {};
+      songMids = list.map((item) => {
+        let {
+          musicData
+        } = item
+        return musicData.songmid;
+      })
       list.forEach((item) => {
-        let {musicData} = item
+        let {
+          musicData
+        } = item;
         if (musicData.songid && musicData.albummid) {
+          keyinfo[musicData.songmid] = musicData;
           ret.push(createSong(musicData))
         }
       })
-      return ret
+      this.songList = ret
+      getplaysongvkey(songMids).then((data) => {
+        let tempData = data.data;
+        let midurlinfo = (tempData && tempData.midurlinfo) || [];
+        let doma = (tempData && tempData.sip && tempData.sip[0]) || '';
+        let retHaveKey = [];
+        midurlinfo.forEach((item) => {
+          let musicData = keyinfo[item.songmid];
+          if (musicData) {
+            musicData.url = doma + item.purl;
+            retHaveKey.push(createSong(musicData))
+          }
+        })
+        this.songList = retHaveKey;
+      }).catch(() => {})
     }
   },
   created () {

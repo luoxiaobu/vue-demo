@@ -1,14 +1,14 @@
 <template>
   <div class="music-list">
     <transition name="show">
-      <div class="ban-back white" @click.stop="back" ref="back" v-if="showLight" key="white">
-        <div class="left-button">
+      <div class="ban-back white" ref="back" v-if="showLight" key="white">
+        <div class="left-button"  @click.stop="back" >
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
       </div>
-      <div v-else class="ban-back dark" @click.stop="back" key="dark">
-        <div class="left-button">
+      <div v-else class="ban-back dark" key="dark">
+        <div class="left-button" @click.stop="back">
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
@@ -30,8 +30,8 @@
 <script>
 import aScroll from 'components/common/AScroll';
 import songList from 'components/common/SongList';
-import { getplaysongvkey } from 'service/song';
 import { prefixStyle } from '@/utils/tools.js';
+import {mapActions} from 'vuex'
 const transform = prefixStyle('transform')
 export default {
   data () {
@@ -94,10 +94,14 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'selectPlay',
+      'randomPlay'
+    ]),
     selectItem (item, index) {
-      var songMid = item.mid;
-      getplaysongvkey(songMid).then((data) => {
-        console.log(data)
+      this.selectPlay({
+        list: this.songs,
+        index
       })
     },
     back () {
@@ -125,6 +129,7 @@ export default {
 
 <style lang="stylus">
 @import "../../themes/variable"
+@import "../../themes/mixin"
 .music-list {
   position: absolute;
   top: 0
@@ -136,8 +141,8 @@ export default {
     left: 0;
     right: 0;
     top: 0;
-    line-height: 40px;
-    height: 40px;
+    line-height: $bar-height;
+    height: $bar-height;
     z-index: 2;
     .left-button {
       position: absolute;
@@ -149,14 +154,7 @@ export default {
       color: $color-pink;
     }
     .back-arrow {
-      width: 10px;
-      height: 10px;
-      transform: rotate(-45deg);
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 10px;
-      border-top: 1px solid $color-pink;
-      border-left: 1px solid $color-pink;
+      normal-arrow($color-pink,-45deg);
     }
   }
   .dark {
@@ -210,7 +208,7 @@ export default {
   }
   .song-wrapper {
     background-color: $background-color-theme;
-    padding: 20px 30px;
+    padding: 20px 20px;
   }
   .show-enter-active, .show-leave-active {
     transition: opacity 0.3s;

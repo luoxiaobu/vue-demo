@@ -6,6 +6,7 @@
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{song.displaySong}}</p>
         </div>
+        <div v-if="song.url" class="play-icon"></div>
       </li>
     </ul>
   </div>
@@ -56,6 +57,14 @@ export default {
         margin-top: 4px;
         color: $color-text-d;
       }
+    }
+    .play-icon {
+      display: inline-block;
+      vertical-align: middle;
+      height: 28px;
+      width: 28px;
+      background: url("../../assets/play.png");
+      background-size: cover;
     }
   }
 }

@@ -1,6 +1,11 @@
 import { jsonpRequest } from '@/utils/jsonpRequest';
 import { qqyBase } from './config'
 
+/**
+ * getplaysongvkey
+ *
+ * @param {array}
+ */
 export function getplaysongvkey (songId) {
   const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg';
   let rnd = Math.floor(Math.random() * 1000000000000000) + 1;
@@ -8,14 +13,13 @@ export function getplaysongvkey (songId) {
     name: `getplaysongvkey${rnd}`,
     param: 'callback'
   };
-  let songArray = [songId];
   let data = JSON.stringify({
-    req_0: {
+    data: {
       module: 'vkey.GetVkeyServer',
       method: 'CgiGetVkey',
       param: {
         guid: '2552350896',
-        songmid: songArray,
+        songmid: songId,
         songtype: [0],
         uin: '0',
         loginflag: 1,
