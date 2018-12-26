@@ -45,11 +45,11 @@ const mutations = {
 
 const actions = {
   selectPlay: ({commit, state}, {list, index}) => {
-    commit(types.SET_SEQUENCE_LIST, list)
-    commit(types.SET_PLAYLIST, list)
-    commit(types.SET_CURRENT_INDEX, index)
-    commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL)
-    commit(types.SET_PLAYING, true)
+    commit(types.SET_SEQUENCE_LIST, list);
+    commit(types.SET_PLAYLIST, list);
+    commit(types.SET_CURRENT_INDEX, index);
+    commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
+    commit(types.SET_PLAYING, true);
   }
 }
 

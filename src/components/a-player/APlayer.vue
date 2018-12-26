@@ -12,7 +12,7 @@
     @after-leave="afterLeave">
       <div class="normal-player" v-if="showMode === SHOW_MODE.NORMAL">
         <div class="background">
-          <img width="100%" height="100%" v-lazy="currentSong.image">
+          <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="normal-top">
           <div class="left-button" @click.stop="showPlay(SHOW_MODE.HIDDEN)">
@@ -28,9 +28,9 @@
         <div class="normal-middle">
           <div class="play-card" ref="cdWrapper">
             <div class="song-rollwrap">
-              <img :class="[playStatus,'singer-card']" width="100%" height="100%" v-lazy="currentSong.image">
+              <img :class="[playStatus,'singer-card']" width="100%" height="100%" :src="currentSong.image">
             </div>
-            <div class="play-button" @click.stop="togglePlaying()">
+            <div class="play-button" @click.stop="togglePlaying">
               <i class="icon-play-mini" v-show="!playing"></i>
             </div>
           </div>
@@ -41,13 +41,13 @@
               <i class="icon-sequence"></i>
             </div>
             <div class="icon" :class="disableCls">
-              <i class="icon-prev"></i>
+              <i @click="prevSong" class="icon-prev"></i>
             </div>
             <div class="icon" :class="disableCls">
               <i @click="togglePlaying" :class="[playIcon, 'i-center']"></i>
             </div>
             <div class="icon" :class="disableCls">
-              <i class="icon-next"></i>
+              <i @click="nextSong" class="icon-next"></i>
             </div>
             <div class="icon">
               <i class="icon-favorite"></i>
@@ -76,7 +76,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 <script>
@@ -117,7 +117,7 @@ export default {
   watch: {
     currentSong () {
       this.$nextTick(() => {
-        this.$refs.audio.play()
+        this.$refs.audio.play();
       })
     },
     playing (newPlaying) {
@@ -130,13 +130,52 @@ export default {
   methods: {
     ...mapMutations({
       setShowMode: 'SET_SHOW_MODE',
-      seyPlaying: 'SET_PLAYING'
+      seyPlaying: 'SET_PLAYING',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     }),
+    prev (length, isActive) {
+      var songTo = isActive - 1;
+      songTo = songTo < 0 ? length - 1 : songTo;
+      return songTo;
+    },
+    next (length, isActive) {
+      var songTo = isActive + 1;
+      songTo = songTo >= length ? 0 : songTo;
+      return songTo;
+    },
     showPlay (mode) {
       this.setShowMode(mode)
     },
+    ready () {
+      this.songReady = true;
+    },
+    error () {
+      this.songReady = true
+    },
     togglePlaying () {
       this.seyPlaying(!this.playing);
+    },
+    prevSong () {
+      if (!this.songReady) {
+        return
+      }
+      var index = this.prev(this.playlist.length, this.currentIndex);
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
+    },
+    nextSong () {
+      if (!this.songReady) {
+        return
+      }
+      var index = this.next(this.playlist.length, this.currentIndex);
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
     },
     beforeEnter: function (el) {
       const {x, y, scale} = this._getPosAndScale();
