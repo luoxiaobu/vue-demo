@@ -40,3 +40,15 @@ export function prefixStyle (style) {
 
   return vendor + style.charAt(0).toUpperCase() + style.substr(1)
 }
+
+/**
+ * dataLeftCompleting
+ * @param {integer} number of format bits
+ * @param {string}  completion character
+ * @param value
+ */
+
+export function dataLeftCompleting (bits, identifier, value) {
+  value = Array(bits + 1).join(identifier) + value;
+  return value.slice(-bits);
+}
