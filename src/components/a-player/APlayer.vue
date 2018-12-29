@@ -15,27 +15,39 @@
           <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="normal-top">
-          <div class="left-button" @click.stop="showPlay(SHOW_MODE.HIDDEN)">
-            <div class="back-arrow"></div>
-            <div class="left-title">返回</div>
+          <div class="normal-top-content">
+            <div class="left-button" @click.stop="showPlay(SHOW_MODE.HIDDEN)">
+              <div class="back-arrow"></div>
+              <div class="left-title">返回</div>
+            </div>
+            <div class="normal-player-title">
+              <h1 class="title" v-html="currentSong.name"></h1>
+              <h2 class="subtitle" v-html="currentSong.singer"></h2>
+            </div>
+            <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
           </div>
-          <div class="normal-player-title">
-            <h1 class="title" v-html="currentSong.name"></h1>
-            <h2 class="subtitle" v-html="currentSong.singer"></h2>
-          </div>
-          <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
         </div>
         <div class="normal-middle">
           <div class="play-card" ref="cdWrapper">
             <div class="song-rollwrap">
-              <img :class="[playStatus,'singer-card']" width="100%" height="100%" :src="currentSong.image">
+              <div :class="[playStatus,'singer-card']">
+                <img class="image" width="100%" height="100%" :src="currentSong.image">
+              </div>
             </div>
             <div class="play-button" @click.stop="togglePlaying">
               <i class="icon-play-mini" v-show="!playing"></i>
             </div>
           </div>
+          <div class="lyric-wrapper">
+            <div class="song-singer">
+              <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
+            </div>
+            <div class="playing-lyric">{{playingLyric}}</div>
+            <div class="next-lyric">{{playingLyric}}</div>
+          </div>
         </div>
         <div class="normal-bottom">
+          <progress-bar :total-time="currentSong.duration" :current-time="currentTime" @timeChange="onTimeChange"></progress-bar>
           <div class="operators">
             <div class="icon">
               <i class="icon-sequence"></i>
@@ -62,7 +74,9 @@
           <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="icon">
-          <img :class="[playStatus,'singer-card']" width="40" height="40" :src="currentSong.image">
+          <div :class="[playStatus,'singer-card']">
+            <img class="image" width="40" height="40" :src="currentSong.image">
+          </div>
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -76,7 +90,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="timeUpdate"></audio>
   </div>
 </template>
 <script>
@@ -84,14 +98,20 @@ import { mapGetters, mapMutations } from 'vuex';
 import { SHOW_MODE } from '@/data/consts';
 import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
+import progressBar from 'components/common/ProgressBar';
 const transform = prefixStyle('transform')
 const transition = prefixStyle('transition')
 export default {
   data () {
     return {
       SHOW_MODE,
-      songReady: false
+      songReady: false,
+      playingLyric: '',
+      currentTime: 0
     }
+  },
+  components: {
+    progressBar
   },
   computed: {
     ...mapGetters([
@@ -151,6 +171,12 @@ export default {
     },
     error () {
       this.songReady = true
+    },
+    timeUpdate (e) {
+      this.currentTime = e.target.currentTime;
+    },
+    onTimeChange (currentTime) {
+      this.$refs.audio.currentTime = currentTime;
     },
     togglePlaying () {
       this.seyPlaying(!this.playing);
@@ -231,18 +257,19 @@ export default {
     top: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
     filter: blur(20px);
     opacity: 0.6;
   }
   .singer-card {
-    border-radius: 100%;
     &.play {
       animation: circling 20s infinite linear;
     }
     &.pause {
       animation-play-state: paused
     }
+  }
+  .image {
+    border-radius: 50%;
   }
   .normal-player {
     background-color: #6d6d6d;
@@ -254,10 +281,15 @@ export default {
     z-index: 10;
   }
   .normal-top {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
-    color: $color-text-light;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    .normal-top-content {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      color: $color-text-light;
+    }
     .left-button {
       width: 60px;
       .left-title {
@@ -321,6 +353,13 @@ export default {
         font-size: 40px;
       }
     }
+    .lyric-wrapper {
+      padding: 0 35px;
+      margin-top: 25px;
+      text-align: center;
+      font-size: $font-size-small;
+      color: $color-text-gr;
+    }
   }
   .normal-bottom {
     position: absolute;
@@ -362,7 +401,7 @@ export default {
     }
   }
   .mini-player {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     z-index: 180;
@@ -385,17 +424,16 @@ export default {
       flex: 1;
       line-height: 20px;
       overflow: hidden;
+      color: $color-text-dark;
     }
     .name {
       margin-bottom: 2px
       no-wrap()
       font-size: $font-size-medium
-      color: $color-text-dark;
     }
     .desc {
       no-wrap()
       font-size: $font-size-small
-      color: $color-text-d;
     }
     .control {
       width: 50px;
@@ -439,7 +477,7 @@ export default {
 
 @media screen and (min-width: 360px) {
   .a-player  {
-    .normal-player-middle {
+    .normal-middle {
       .play-card {
         width: 296px;
         height: 296px;
