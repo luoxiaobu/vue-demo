@@ -52,3 +52,18 @@ export function dataLeftCompleting (bits, identifier, value) {
   value = Array(bits + 1).join(identifier) + value;
   return value.slice(-bits);
 }
+
+/**
+ * shuffle
+ * @param { array }
+ */
+
+export function shuffle (arr) {
+  let _arr = arr.slice();
+  let i = _arr.length;
+  while (i) {
+    let j = Math.floor(Math.random() * i--);
+    [_arr[j], _arr[i]] = [_arr[i], _arr[j]];
+  }
+  return _arr
+}

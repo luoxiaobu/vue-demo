@@ -14,13 +14,13 @@
         </ul>
       </li>
     </ul>
+    <div class="list-fixed list-group-title" ref= "fixed" v-show="fixedTitle">
+      {{fixedTitle}}
+    </div>
     <div class="side-bar" v-if="barData.length" @touchstart.stop="barTouchStart" @touchmove.stop="barTouchMove">
       <div :class="['side-bar-item',{'current':index===currentIndex}]" v-for="(title, index) in barData" :key="index" :data-index="index">
         {{title}}
       </div>
-    </div>
-    <div class="list-fixed list-group-title" ref= "fixed" v-show="fixedTitle">
-      {{fixedTitle}}
     </div>
   </a-scroll>
 </template>
@@ -178,7 +178,6 @@ export default {
     padding-bottom: 20px;
   }
   .side-bar {
-    z-index: 1;
     touch-action: none;
     position: absolute;
     right: 0;

@@ -49,8 +49,8 @@
         <div class="normal-bottom">
           <progress-bar :total-time="currentSong.duration" :current-time="currentTime" @timeChange="onTimeChange"></progress-bar>
           <div class="operators">
-            <div class="icon">
-              <i class="icon-sequence"></i>
+            <div class="icon" @click.stop="changeMode">
+              <i :class="iconMode[playMode]"></i>
             </div>
             <div class="icon" :class="disableCls">
               <i @click="prevSong" class="icon-prev"></i>
@@ -73,20 +73,24 @@
         <div class="background">
           <img width="100%" height="100%" :src="currentSong.image">
         </div>
-        <div class="icon">
-          <div :class="[playStatus,'singer-card']">
-            <img class="image" width="40" height="40" :src="currentSong.image">
+        <div class="mini-player-content">
+          <div class="icon">
+            <div :class="[playStatus,'singer-card']">
+              <img class="image" width="40" height="40" :src="currentSong.image">
+            </div>
           </div>
-        </div>
-        <div class="text">
-          <h2 class="name" v-html="currentSong.name"></h2>
-          <p class="desc" v-html="currentSong.singer"></p>
-        </div>
-        <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
-        </div>
-        <div class="control">
-          <i class="icon-playlist"></i>
+          <div class="text">
+            <h2 class="name" v-html="currentSong.name"></h2>
+            <p class="desc" v-html="currentSong.singer"></p>
+          </div>
+          <div class="control">
+            <progress-circle :radius="radius" :percent="percent">
+              <i @click.stop="togglePlaying" :class="miniIcon"></i>
+            </progress-circle>
+          </div>
+          <div class="control">
+            <i class="icon-playlist"></i>
+          </div>
         </div>
       </div>
     </transition>
@@ -99,19 +103,28 @@ import { SHOW_MODE } from '@/data/consts';
 import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
-const transform = prefixStyle('transform')
-const transition = prefixStyle('transition')
+import progressCircle from 'components/common/ProgressCircle';
+const transform = prefixStyle('transform');
+const transition = prefixStyle('transition');
+const iconMode = {
+  0: 'icon-sequence',
+  1: 'icon-loop',
+  2: 'icon-random'
+};
+
 export default {
   data () {
     return {
       SHOW_MODE,
       songReady: false,
       playingLyric: '',
-      currentTime: 0
+      currentTime: 0,
+      radius: 30,
+      iconMode
     }
   },
   components: {
-    progressBar
+    progressBar, progressCircle
   },
   computed: {
     ...mapGetters([
@@ -119,7 +132,8 @@ export default {
       'showMode',
       'playing',
       'currentSong',
-      'playlist'
+      'playlist',
+      'playMode'
     ]),
     playStatus () {
       return this.playing ? 'play' : 'play pause';
@@ -132,6 +146,9 @@ export default {
     },
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    percent () {
+      return this.currentTime / this.currentSong.duration
     }
   },
   watch: {
@@ -151,8 +168,13 @@ export default {
     ...mapMutations({
       setShowMode: 'SET_SHOW_MODE',
       seyPlaying: 'SET_PLAYING',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE'
     }),
+    changeMode () {
+      const mode = (this.playMode + 1) % 3
+      this.setPlayMode(mode)
+    },
     prev (length, isActive) {
       var songTo = isActive - 1;
       songTo = songTo < 0 ? length - 1 : songTo;
@@ -404,18 +426,20 @@ export default {
     position: fixed;
     left: 0;
     bottom: 0;
-    z-index: 180;
     width: 100%;
-    height: 60px;
-    display: flex;
-    align-items: center;
+    z-index: 1;
     background: #fff;
+    .mini-player-content {
+      height: 60px;
+      display: flex;
+      align-items: center;
+    }
     .background {
       opacity: 0.8;
     }
     .icon {
       width: 80px
-      padding: 0 10px 0 20px
+      padding: 0 20px;
     }
     .text {
       display: flex;
