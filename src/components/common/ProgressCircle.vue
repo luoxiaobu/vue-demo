@@ -2,7 +2,7 @@
   <div class="progress-circle">
     <!-- viewBox stroke-dasharray stroke-dashoffset are very interesting -->
     <svg :width="radius" :height="radius" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-      <circle class="progress-bar" r="50" :style="{'stroke-width':strokeWidth}" cx="50" cy="50" fill="transparent" :stroke-dasharray="dashArray" :stroke-dashoffset="dashOffset"/>
+      <circle class="progress-bar" r="50" cx="50" cy="50" fill="transparent" :stroke-dasharray="dashArray" :stroke-dashoffset="dashOffset"/>
     </svg>
     <div class="progress-content">
       <slot></slot>
@@ -18,10 +18,6 @@ export default {
       default: 30
     },
     percent: {
-      type: Number,
-      default: 0
-    },
-    strokeWidth: {
       type: Number,
       default: 0
     }
@@ -49,6 +45,7 @@ export default {
   .progress-bar {
     transform: scale(0.9) rotate(-90deg);
     stroke: $color-pink;
+    stroke-width: 10px;
   }
   .progress-content {
     top: 0;

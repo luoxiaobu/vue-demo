@@ -49,8 +49,8 @@
         <div class="normal-bottom">
           <progress-bar :total-time="currentSong.duration" :current-time="currentTime" @timeChange="onTimeChange"></progress-bar>
           <div class="operators">
-            <div class="icon">
-              <i class="icon-sequence"></i>
+            <div class="icon" @click.stop="changeMode">
+              <i :class="iconMode[playMode]"></i>
             </div>
             <div class="icon" :class="disableCls">
               <i @click="prevSong" class="icon-prev"></i>
@@ -84,7 +84,7 @@
             <p class="desc" v-html="currentSong.singer"></p>
           </div>
           <div class="control">
-            <progress-circle :radius="radius" :percent="percent" :stroke-width="strokeWidth">
+            <progress-circle :radius="radius" :percent="percent">
               <i @click.stop="togglePlaying" :class="miniIcon"></i>
             </progress-circle>
           </div>
@@ -104,8 +104,14 @@ import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
-const transform = prefixStyle('transform')
-const transition = prefixStyle('transition')
+const transform = prefixStyle('transform');
+const transition = prefixStyle('transition');
+const iconMode = {
+  0: 'icon-sequence',
+  1: 'icon-loop',
+  2: 'icon-random'
+};
+
 export default {
   data () {
     return {
@@ -114,7 +120,7 @@ export default {
       playingLyric: '',
       currentTime: 0,
       radius: 30,
-      strokeWidth: 10
+      iconMode
     }
   },
   components: {
@@ -126,7 +132,8 @@ export default {
       'showMode',
       'playing',
       'currentSong',
-      'playlist'
+      'playlist',
+      'playMode'
     ]),
     playStatus () {
       return this.playing ? 'play' : 'play pause';
@@ -161,8 +168,13 @@ export default {
     ...mapMutations({
       setShowMode: 'SET_SHOW_MODE',
       seyPlaying: 'SET_PLAYING',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE'
     }),
+    changeMode () {
+      const mode = (this.playMode + 1) % 3
+      this.setPlayMode(mode)
+    },
     prev (length, isActive) {
       var songTo = isActive - 1;
       songTo = songTo < 0 ? length - 1 : songTo;
