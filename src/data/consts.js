@@ -9,3 +9,9 @@ export const SHOW_MODE = {
   NORMAL: 1,
   MINI: 2
 }
+
+export const iconMode = {
+  0: 'icon-sequence',
+  1: 'icon-loop',
+  2: 'icon-random'
+}

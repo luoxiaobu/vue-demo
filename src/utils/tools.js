@@ -12,6 +12,7 @@ export function getData (el, dataName, value) {
   }
 }
 
+// completion prefix
 let eleStyle = document.createElement('div').style;
 let vendor = (() => {
   let transformNames = {
@@ -47,17 +48,15 @@ export function prefixStyle (style) {
  * @param {string}  completion character
  * @param value
  */
-
 export function dataLeftCompleting (bits, identifier, value) {
   value = Array(bits + 1).join(identifier) + value;
   return value.slice(-bits);
 }
 
 /**
- * shuffle
+ * shuffle (disrupt array order)
  * @param { array }
  */
-
 export function shuffle (arr) {
   let _arr = arr.slice();
   let i = _arr.length;
@@ -66,4 +65,14 @@ export function shuffle (arr) {
     [_arr[j], _arr[i]] = [_arr[i], _arr[j]];
   }
   return _arr
+}
+
+/**
+ * findIndex
+ * @param { array }
+ */
+export function findIndex (list, song) {
+  return list.findIndex((item) => {
+    return item.id === song.id
+  })
 }

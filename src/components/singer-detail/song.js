@@ -1,3 +1,5 @@
+import { getLyric } from 'service/song';
+
 export default class Song {
   constructor ({id, mid, singer, name, album, duration, image, url}) {
     this.id = id
@@ -8,6 +10,15 @@ export default class Song {
     this.duration = duration
     this.image = image
     this.url = url
+  }
+
+  getLyric () {
+    if (this.lyric) {
+      return Promise.resolve(this.lyric)
+    }
+    return getLyric(this.mid).then((res) => {
+      this.lyric = res.lyric
+    })
   }
 }
 
