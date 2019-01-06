@@ -1,10 +1,13 @@
 import { jsonpRequest } from '@/utils/jsonpRequest';
+import { axiosRequest } from '@/utils/axiosRequest'
 import { qqyBase } from './config'
+
+const requestIns = axiosRequest();
 
 /**
  * getplaysongvkey
  *
- * @param {array}
+ * @param {String} songId
  */
 export function getplaysongvkey (songId) {
   const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg';
@@ -37,4 +40,23 @@ export function getplaysongvkey (songId) {
     data
   })
   return jsonpRequest(url, reallyData, opts)
+}
+
+/**
+ * getLyric
+ *
+ * @param {String} mid
+ */
+export function getLyric (mid) {
+  const url = '/api/lyric'
+  const data = Object.assign({}, qqyBase, {
+    songmid: mid,
+    categoryId: 10000000,
+    pcachetime: +new Date(),
+    format: 'json'
+  })
+
+  return requestIns(url, {
+    params: data
+  })
 }

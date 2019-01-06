@@ -1,5 +1,6 @@
 import * as types from '@/store/mutation-types';
 import { PLAY_MODE, SHOW_MODE } from '@/data/consts';
+import { shuffle, findIndex } from '@/utils/tools.js';
 
 const state = {
   playing: false,
@@ -45,11 +46,26 @@ const mutations = {
 
 const actions = {
   selectPlay: ({commit, state}, {list, index}) => {
-    commit(types.SET_SEQUENCE_LIST, list);
-    commit(types.SET_PLAYLIST, list);
-    commit(types.SET_CURRENT_INDEX, index);
+    commit(types.SET_SEQUENCE_LIST, list)
+    if (state.playMode === PLAY_MODE.RANDOM) {
+      let randomList = shuffle(list);
+      commit(types.SET_PLAYLIST, randomList)
+      index = findIndex(randomList, list[index])
+    } else {
+      commit(types.SET_PLAYLIST, list)
+    }
+    commit(types.SET_CURRENT_INDEX, index)
     commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
+    commit(types.SET_PLAYING, true)
+  },
+  randomPlay: ({commit, state}, {list}) => {
+    commit(types.SET_SEQUENCE_LIST, list);
+    let randomList = shuffle(list);
+    commit(types.SET_PLAY_MODE, PLAY_MODE.RANDOM);
+    commit(types.SET_PLAYLIST, randomList);
+    commit(types.SET_CURRENT_INDEX, 0);
     commit(types.SET_PLAYING, true);
+    commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
   }
 }
 

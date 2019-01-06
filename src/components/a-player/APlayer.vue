@@ -94,23 +94,18 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="timeUpdate"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="timeUpdate" @ended="ended"></audio>
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations } from 'vuex';
-import { SHOW_MODE } from '@/data/consts';
-import { prefixStyle } from '@/utils/tools.js';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { SHOW_MODE, PLAY_MODE, iconMode } from '@/data/consts';
+import { prefixStyle, shuffle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
-const iconMode = {
-  0: 'icon-sequence',
-  1: 'icon-loop',
-  2: 'icon-random'
-};
 
 export default {
   data () {
@@ -133,7 +128,8 @@ export default {
       'playing',
       'currentSong',
       'playlist',
-      'playMode'
+      'playMode',
+      'sequenceList'
     ]),
     playStatus () {
       return this.playing ? 'play' : 'play pause';
@@ -152,9 +148,13 @@ export default {
     }
   },
   watch: {
-    currentSong () {
+    currentSong (newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return
+      }
       this.$nextTick(() => {
         this.$refs.audio.play();
+        this.currentSong.getLyric();
       })
     },
     playing (newPlaying) {
@@ -169,11 +169,32 @@ export default {
       setShowMode: 'SET_SHOW_MODE',
       seyPlaying: 'SET_PLAYING',
       setCurrentIndex: 'SET_CURRENT_INDEX',
-      setPlayMode: 'SET_PLAY_MODE'
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     }),
+    ...mapActions([
+      'randomPlay'
+    ]),
+    random () {
+      this.randomPlay(this.sequenceList)
+    },
     changeMode () {
       const mode = (this.playMode + 1) % 3
       this.setPlayMode(mode)
+      let list = null
+      if (mode === PLAY_MODE.RANDOM) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list);
+      this.setPlayList(list);
+    },
+    resetCurrentIndex (list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index);
     },
     prev (length, isActive) {
       var songTo = isActive - 1;
@@ -184,6 +205,17 @@ export default {
       var songTo = isActive + 1;
       songTo = songTo >= length ? 0 : songTo;
       return songTo;
+    },
+    ended () {
+      if (this.playMode === PLAY_MODE.LOOP) {
+        this.loop();
+      } else {
+        this.nextSong();
+      }
+    },
+    loop () {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
     },
     showPlay (mode) {
       this.setShowMode(mode)

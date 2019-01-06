@@ -12,7 +12,7 @@ export function axiosRequest (config = {}) {
     var data = res.data || res;
     // may handle some common error
     if (data.code === 0) {
-      return data.data;
+      return data.data || data;
     }
     return Promise.reject(data);
   });
@@ -33,5 +33,6 @@ export function axiosRequest (config = {}) {
     });
     return promise;
   };
+  request.interceptors = axiosIns.interceptors;
   return request;
 }
