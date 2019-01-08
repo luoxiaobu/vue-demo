@@ -104,6 +104,7 @@ import { prefixStyle, shuffle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
+import Lyric from 'components/a-player/lyric'
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 
@@ -115,7 +116,8 @@ export default {
       playingLyric: '',
       currentTime: 0,
       radius: 30,
-      iconMode
+      iconMode,
+      currentLyric: null
     }
   },
   components: {
@@ -154,7 +156,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play();
-        this.currentSong.getLyric();
+        this.getLyric();
       })
     },
     playing (newPlaying) {
@@ -175,6 +177,14 @@ export default {
     ...mapActions([
       'randomPlay'
     ]),
+    getLyric () {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new Lyric(lyric)
+        console.log(this.currentLyric)
+      }).catch(() => {
+        this.currentLyric = null
+      })
+    },
     random () {
       this.randomPlay(this.sequenceList)
     },

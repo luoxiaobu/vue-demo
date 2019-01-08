@@ -1,5 +1,5 @@
 import { getLyric } from 'service/song';
-
+import {Base64} from 'js-base64';
 export default class Song {
   constructor ({id, mid, singer, name, album, duration, image, url}) {
     this.id = id
@@ -17,7 +17,8 @@ export default class Song {
       return Promise.resolve(this.lyric)
     }
     return getLyric(this.mid).then((res) => {
-      this.lyric = res.lyric
+      this.lyric = Base64.decode(res.lyric)
+      return this.lyric
     })
   }
 }
