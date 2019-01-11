@@ -113,7 +113,6 @@ export default {
     return {
       SHOW_MODE,
       songReady: false,
-      playingLyric: '',
       currentTime: 0,
       radius: 30,
       iconMode,
@@ -147,6 +146,9 @@ export default {
     },
     percent () {
       return this.currentTime / this.currentSong.duration
+    },
+    playingLyric () {
+      return this.currentLyric ? this.currentLyric.currentLine.txt : '...'
     }
   },
   watch: {
@@ -180,7 +182,9 @@ export default {
     getLyric () {
       this.currentSong.getLyric().then((lyric) => {
         this.currentLyric = new Lyric(lyric)
-        console.log(this.currentLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
       }).catch(() => {
         this.currentLyric = null
       })
