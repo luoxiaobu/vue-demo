@@ -159,10 +159,7 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
-        this.$refs.audio.play();
-        this.getLyric();
-      })
+      this.getLyric();
     }
   },
   methods: {
@@ -236,6 +233,7 @@ export default {
     },
     ready () {
       this.songReady = true;
+      this.togglePlaying()
       if (this.canplayLyric) {
         this.currentLyric.play()
       }
