@@ -148,7 +148,10 @@ export default {
       return this.currentTime / this.currentSong.duration
     },
     playingLyric () {
-      return this.currentLyric ? this.currentLyric.currentLine.txt : '...'
+      return this.currentLyric ? this.currentLyric.currentLine && this.currentLyric.currentLine.txt : '...'
+    },
+    canplayLyric () {
+      return this.playing && this.songReady && this.currentLyric;
     }
   },
   watch: {
@@ -159,12 +162,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.audio.play();
         this.getLyric();
-      })
-    },
-    playing (newPlaying) {
-      const audio = this.$refs.audio;
-      this.$nextTick(() => {
-        newPlaying ? audio.play() : audio.pause();
       })
     }
   },
@@ -181,9 +178,12 @@ export default {
     ]),
     getLyric () {
       this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new Lyric(lyric)
-        if (this.playing) {
-          this.currentLyric.play()
+        if (this.canplayLyric) {
+          this.currentLyric.play(this.currentTime)
         }
       }).catch(() => {
         this.currentLyric = null
@@ -236,6 +236,9 @@ export default {
     },
     ready () {
       this.songReady = true;
+      if (this.canplayLyric) {
+        this.currentLyric.play()
+      }
     },
     error () {
       this.songReady = true
@@ -247,7 +250,12 @@ export default {
       this.$refs.audio.currentTime = currentTime;
     },
     togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
+      const audio = this.$refs.audio;
       this.seyPlaying(!this.playing);
+      this.playing ? audio.play() : audio.pause();
     },
     prevSong () {
       if (!this.songReady) {
@@ -329,6 +337,7 @@ export default {
     opacity: 0.6;
   }
   .singer-card {
+    height: 100%;
     &.play {
       animation: circling 20s infinite linear;
     }
