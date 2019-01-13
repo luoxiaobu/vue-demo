@@ -43,7 +43,6 @@
               <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
             </div>
             <div class="playing-lyric">{{playingLyric}}</div>
-            <div class="next-lyric">{{playingLyric}}</div>
           </div>
         </div>
         <div class="normal-bottom">
@@ -159,6 +158,7 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
+      this.currentLyric = null;
       this.getLyric();
     }
   },
@@ -180,7 +180,7 @@ export default {
         }
         this.currentLyric = new Lyric(lyric)
         if (this.canplayLyric) {
-          this.currentLyric.play(this.currentTime)
+          this.currentLyric.play(this.currentTime * 1000)
         }
       }).catch(() => {
         this.currentLyric = null
@@ -233,9 +233,10 @@ export default {
     },
     ready () {
       this.songReady = true;
-      this.togglePlaying()
+      const audio = this.$refs.audio;
+      this.playing ? audio.play() : audio.pause();
       if (this.canplayLyric) {
-        this.currentLyric.play()
+        this.currentLyric.play(this.currentTime * 1000)
       }
     },
     error () {
@@ -434,6 +435,12 @@ export default {
       text-align: center;
       font-size: $font-size-small;
       color: $color-text-gr;
+      .playing-lyric {
+        padding-top: 5px;
+        line-height: 20px;
+        font-size: $font-size-medium;
+        color: $color-text-light;
+      }
     }
   }
   .normal-bottom {

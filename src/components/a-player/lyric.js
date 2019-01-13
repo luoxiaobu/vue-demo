@@ -13,9 +13,10 @@ export default class Lyric {
       return
     }
     this.nextIndex = this.lines.findIndex((item) => {
-      return item.time > startTime
+      return item.time > startTime;
     })
-    this.startStamp = +new Date() - startTime
+    this.nextIndex = ~this.nextIndex ? this.nextIndex : this.lines.length - 1;
+    this.startStamp = +new Date() - startTime;
     this.currentLine = this.lines[this.nextIndex - 1];
     if (this.nextIndex < this.lines.length) {
       clearTimeout(this.timer);
@@ -41,8 +42,8 @@ function filterLines (lyric) {
   var lines = []
   lyc.forEach((item) => {
     let result = timeExp.exec(item)
-    if (result) {
-      const txt = item.replace(timeExp, '').trim();
+    const txt = item.replace(timeExp, '').trim();
+    if (result && txt) {
       lines.push({
         time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3] || 0) * 10,
         txt

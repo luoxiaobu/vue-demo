@@ -49,7 +49,8 @@ export default {
   },
   computed: {
     percent () {
-      return `${(this.reallyTime / this.totalTime * 100) | 0}%`
+      var s = (this.reallyTime / this.totalTime) >= 1 ? 1 : (this.reallyTime / this.totalTime);
+      return `${(s * 100) | 0}%`
     }
   },
   methods: {
