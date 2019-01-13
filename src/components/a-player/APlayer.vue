@@ -147,10 +147,10 @@ export default {
       return this.currentTime / this.currentSong.duration
     },
     playingLyric () {
-      return this.currentLyric ? this.currentLyric.currentLine && this.currentLyric.currentLine.txt : '...'
+      return this.currentLyric ? this.currentLyric.currentTxt : '...'
     },
-    canplayLyric () {
-      return this.playing && this.songReady && this.currentLyric;
+    nextLyricTime () {
+      return this.currentLyric ? this.currentLyric.nextTime : 0
     }
   },
   watch: {
@@ -179,9 +179,6 @@ export default {
           return
         }
         this.currentLyric = new Lyric(lyric)
-        if (this.canplayLyric) {
-          this.currentLyric.play(this.currentTime * 1000)
-        }
       }).catch(() => {
         this.currentLyric = null
       })
@@ -235,15 +232,16 @@ export default {
       this.songReady = true;
       const audio = this.$refs.audio;
       this.playing ? audio.play() : audio.pause();
-      if (this.canplayLyric) {
-        this.currentLyric.play(this.currentTime * 1000)
-      }
     },
     error () {
       this.songReady = true
     },
     timeUpdate (e) {
       this.currentTime = e.target.currentTime;
+      if ((this.currentTime >= this.nextLyricTime) && this.currentLyric) {
+        console.log(this.currentTime)
+        this.currentLyric.playNext(this.currentTime * 1000)
+      }
     },
     onTimeChange (currentTime) {
       this.$refs.audio.currentTime = currentTime;

@@ -5,35 +5,24 @@ export default class Lyric {
     this.lyc = lyc;
     this.lines = filterLines(lyc);
     this.currentLine = '';
+    this.currentTxt = '';
     this.currentIndex = 0;
+    this.nextTime = 0;
   }
   // startTime is audio currentTime
-  play (startTime = 0) {
+  playNext (startTime = 0) {
     if (!this.lines.length) {
       return
     }
     this.nextIndex = this.lines.findIndex((item) => {
       return item.time > startTime;
     })
-    this.nextIndex = ~this.nextIndex ? this.nextIndex : this.lines.length - 1;
-    this.startStamp = +new Date() - startTime;
-    this.currentLine = this.lines[this.nextIndex - 1];
-    if (this.nextIndex < this.lines.length) {
-      clearTimeout(this.timer);
-      this._playNext()
+    if (this.nextIndex < 0) {
+      return;
     }
-  }
-
-  _playNext () {
-    let line = this.lines[this.nextIndex]
-    let delay = line.time - (+new Date() - this.startStamp)
-    this.timer = setTimeout(() => {
-      this.currentLine = this.lines[this.nextIndex];
-      this.nextIndex = this.nextIndex + 1;
-      if (this.nextIndex < this.lines.length) {
-        this._playNext()
-      }
-    }, delay)
+    this.currentTxt = this.lines[this.nextIndex - 1].txt;
+    this.currentIndex = this.nextIndex - 1
+    this.nextTime = this.lines[this.nextIndex].time;
   }
 }
 
