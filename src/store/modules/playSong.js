@@ -64,8 +64,8 @@ const actions = {
     commit(types.SET_PLAY_MODE, PLAY_MODE.RANDOM);
     commit(types.SET_PLAYLIST, randomList);
     commit(types.SET_CURRENT_INDEX, 0);
-    commit(types.SET_PLAYING, true);
     commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
+    commit(types.SET_PLAYING, true)
   }
 }
 

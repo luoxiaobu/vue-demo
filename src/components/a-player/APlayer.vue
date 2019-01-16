@@ -43,7 +43,6 @@
               <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
             </div>
             <div class="playing-lyric">{{playingLyric}}</div>
-            <div class="next-lyric">{{playingLyric}}</div>
           </div>
         </div>
         <div class="normal-bottom">
@@ -104,6 +103,7 @@ import { prefixStyle, shuffle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
+import Lyric from 'components/a-player/lyric'
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 
@@ -112,10 +112,10 @@ export default {
     return {
       SHOW_MODE,
       songReady: false,
-      playingLyric: '',
       currentTime: 0,
       radius: 30,
-      iconMode
+      iconMode,
+      currentLyric: null
     }
   },
   components: {
@@ -145,23 +145,24 @@ export default {
     },
     percent () {
       return this.currentTime / this.currentSong.duration
+    },
+    playingLyric () {
+      return this.currentLyric ? this.currentLyric.currentTxt : '...'
+    },
+    nextLyricTime () {
+      return this.currentLyric ? this.currentLyric.nextTime : 0
     }
   },
   watch: {
     currentSong (newSong, oldSong) {
+      if (!newSong.id) {
+        return
+      }
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
-        this.$refs.audio.play();
-        this.currentSong.getLyric();
-      })
-    },
-    playing (newPlaying) {
-      const audio = this.$refs.audio;
-      this.$nextTick(() => {
-        newPlaying ? audio.play() : audio.pause();
-      })
+      this.currentLyric = null;
+      this.getLyric();
     }
   },
   methods: {
@@ -175,6 +176,16 @@ export default {
     ...mapActions([
       'randomPlay'
     ]),
+    getLyric () {
+      this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
+        this.currentLyric = new Lyric(lyric)
+      }).catch(() => {
+        this.currentLyric = null
+      })
+    },
     random () {
       this.randomPlay(this.sequenceList)
     },
@@ -216,24 +227,37 @@ export default {
     loop () {
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
+      this.currentLyric && this.currentLyric.play(0)
     },
     showPlay (mode) {
       this.setShowMode(mode)
     },
     ready () {
       this.songReady = true;
+      const audio = this.$refs.audio;
+      this.playing ? audio.play() : audio.pause();
     },
     error () {
       this.songReady = true
     },
     timeUpdate (e) {
       this.currentTime = e.target.currentTime;
+      var tempTime = this.currentTime * 1000
+      if ((tempTime >= this.nextLyricTime) && this.currentLyric) {
+        this.currentLyric.play(tempTime)
+      }
     },
     onTimeChange (currentTime) {
       this.$refs.audio.currentTime = currentTime;
+      this.currentLyric && this.currentLyric.play(currentTime * 1000)
     },
     togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
+      const audio = this.$refs.audio;
       this.seyPlaying(!this.playing);
+      this.playing ? audio.play() : audio.pause();
     },
     prevSong () {
       if (!this.songReady) {
@@ -315,6 +339,7 @@ export default {
     opacity: 0.6;
   }
   .singer-card {
+    height: 100%;
     &.play {
       animation: circling 20s infinite linear;
     }
@@ -413,6 +438,12 @@ export default {
       text-align: center;
       font-size: $font-size-small;
       color: $color-text-gr;
+      .playing-lyric {
+        padding-top: 5px;
+        line-height: 20px;
+        font-size: $font-size-medium;
+        color: $color-text-light;
+      }
     }
   }
   .normal-bottom {
