@@ -10,7 +10,7 @@ export default class Lyric {
     this.nextTime = 0;
   }
   // startTime is audio currentTime
-  playNext (startTime = 0) {
+  play (startTime = 0) {
     if (!this.lines.length) {
       return
     }
@@ -18,7 +18,13 @@ export default class Lyric {
       return item.time > startTime;
     })
     if (this.nextIndex < 0) {
+      this.nextIndex = this.lines.length - 1;
+      this.currentTxt = this.lines[this.nextIndex].txt;
+      this.nextTime = 10000000;
       return;
+    }
+    if (this.nextIndex === 0) {
+      this.nextIndex = 1;
     }
     this.currentTxt = this.lines[this.nextIndex - 1].txt;
     this.currentIndex = this.nextIndex - 1

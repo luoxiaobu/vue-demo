@@ -155,6 +155,9 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
+      if (!newSong.id) {
+        return
+      }
       if (newSong.id === oldSong.id) {
         return
       }
@@ -224,6 +227,7 @@ export default {
     loop () {
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
+      this.currentLyric && this.currentLyric.play(0)
     },
     showPlay (mode) {
       this.setShowMode(mode)
@@ -238,13 +242,14 @@ export default {
     },
     timeUpdate (e) {
       this.currentTime = e.target.currentTime;
-      if ((this.currentTime >= this.nextLyricTime) && this.currentLyric) {
-        console.log(this.currentTime)
-        this.currentLyric.playNext(this.currentTime * 1000)
+      var tempTime = this.currentTime * 1000
+      if ((tempTime >= this.nextLyricTime) && this.currentLyric) {
+        this.currentLyric.play(tempTime)
       }
     },
     onTimeChange (currentTime) {
       this.$refs.audio.currentTime = currentTime;
+      this.currentLyric && this.currentLyric.play(currentTime * 1000)
     },
     togglePlaying () {
       if (!this.songReady) {
