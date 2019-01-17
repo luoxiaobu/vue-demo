@@ -27,23 +27,33 @@
             <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
           </div>
         </div>
-        <div class="normal-middle">
-          <div class="play-card" ref="cdWrapper">
-            <div class="song-rollwrap">
-              <div :class="[playStatus,'singer-card']">
-                <img class="image" width="100%" height="100%" :src="currentSong.image">
+        <div class="normal-middle" @click="change">
+          <div class="normal-middle-card" v-show="showCard">
+            <div class="play-card" ref="cdWrapper">
+              <div class="song-rollwrap">
+                <div :class="[playStatus,'singer-card']">
+                  <img class="image" width="100%" height="100%" :src="currentSong.image">
+                </div>
+              </div>
+              <div class="play-button" @click.stop="togglePlaying">
+                <i class="icon-play-mini" v-show="!playing"></i>
               </div>
             </div>
-            <div class="play-button" @click.stop="togglePlaying">
-              <i class="icon-play-mini" v-show="!playing"></i>
+            <div class="playing-lyric-wrapper">
+              <div class="song-singer">
+                <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
+              </div>
+              <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
-          <div class="lyric-wrapper">
-            <div class="song-singer">
-              <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
+          <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
+                  v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+              </div>
             </div>
-            <div class="playing-lyric">{{playingLyric}}</div>
-          </div>
+          </a-scroll>
         </div>
         <div class="normal-bottom">
           <progress-bar :total-time="currentSong.duration" :current-time="currentTime" @timeChange="onTimeChange"></progress-bar>
@@ -103,9 +113,11 @@ import { prefixStyle, shuffle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
+import aScroll from 'components/common/AScroll';
 import Lyric from 'components/a-player/lyric'
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
+const TITLE_HEIGHT = 30;
 
 export default {
   data () {
@@ -115,11 +127,12 @@ export default {
       currentTime: 0,
       radius: 30,
       iconMode,
-      currentLyric: null
+      currentLyric: null,
+      showCard: true
     }
   },
   components: {
-    progressBar, progressCircle
+    progressBar, progressCircle, aScroll
   },
   computed: {
     ...mapGetters([
@@ -151,6 +164,9 @@ export default {
     },
     nextLyricTime () {
       return this.currentLyric ? this.currentLyric.nextTime : 0
+    },
+    currentLineNum () {
+      return this.currentLyric ? this.currentLyric.currentIndex : 0
     }
   },
   watch: {
@@ -176,15 +192,24 @@ export default {
     ...mapActions([
       'randomPlay'
     ]),
+    change () {
+      this.showCard = !this.showCard;
+    },
     getLyric () {
       this.currentSong.getLyric().then((lyric) => {
         if (this.currentSong.lyric !== lyric) {
           return
         }
-        this.currentLyric = new Lyric(lyric)
+        this.currentLyric = new Lyric(lyric, this.handleLyric)
       }).catch(() => {
         this.currentLyric = null
       })
+    },
+    handleLyric (index) {
+      if (index > 5) {
+        var scrollLyricHeight = (index - 5) * TITLE_HEIGHT;
+        this.$refs.lyricList && this.$refs.lyricList.scrollTo(scrollLyricHeight);
+      }
     },
     random () {
       this.randomPlay(this.sequenceList)
@@ -297,7 +322,7 @@ export default {
       this.$refs.cdWrapper.style[transform] = ''
     },
     leave (el, done) {
-      this.$refs.cdWrapper.style[transition] = 'all 0.4s'
+      this.$refs.cdWrapper.style[transition] = 'all 0.4s';
       const {x, y, scale} = this._getPosAndScale()
       this.$refs.cdWrapper.style[transform] = `${getTranslate(`${x}px`, `${y}px`, 0)} scale(${scale})`
       this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
@@ -432,10 +457,12 @@ export default {
         font-size: 40px;
       }
     }
-    .lyric-wrapper {
+    .lyric-wrapper , .playing-lyric-wrapper {
       padding: 0 35px;
-      margin-top: 25px;
       text-align: center;
+    }
+    .playing-lyric-wrapper {
+      margin-top: 25px;
       font-size: $font-size-small;
       color: $color-text-gr;
       .playing-lyric {
@@ -443,6 +470,16 @@ export default {
         line-height: 20px;
         font-size: $font-size-medium;
         color: $color-text-light;
+      }
+    }
+    .lyric-wrapper {
+      .text {
+        line-height: 30px;
+        color: rgba(225,225,225,.6);
+        font-size: $font-size-medium
+        &.current {
+          color: $color-text-light;
+        }
       }
     }
   }
