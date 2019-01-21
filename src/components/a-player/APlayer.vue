@@ -46,8 +46,8 @@
               <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
-          <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll" @touchmove.stop="lyricTouchMove">
-            <div class="lyric-wrapper" v-if="currentLyric">
+          <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
+            <div class="lyric-wrapper" v-if="currentLyric" @touchmove.stop="lyricTouchMove">
               <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
                 v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
                 <div class="showTimeLine" :style="showTimeHeight"></div>
@@ -121,7 +121,7 @@ const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 const TITLE_HEIGHT = 30;
 const SHOW_LINE = 5;
-const BASE = SHOW_LINE * TITLE_HEIGHT
+const BASE = 6 * TITLE_HEIGHT
 
 export default {
   data () {
@@ -135,7 +135,8 @@ export default {
       showCard: true,
       listenScroll: true,
       listHeight: [],
-      showTimeLine: 1
+      showTimeLine: 1,
+      scrollY: 0
     }
   },
   components: {
@@ -204,14 +205,16 @@ export default {
       'randomPlay'
     ]),
     scroll (pos) {
-      if (pos.y >= this.listHeight[this.showTimeLine] || pos.y <= this.listHeight[this.showTimeLine - 1]) {
+      this.scrollY = pos.y
+    },
+    lyricTouchMove () {
+      if (this.scrollY >= this.listHeight[this.showTimeLine] || this.scrollY <= this.listHeight[this.showTimeLine - 1]) {
         this.showTimeLine = this.listHeight.findIndex((item) => {
-          return pos.y + BASE < item
+          return this.scrollY + BASE < item
         })
         console.log(this.showTimeLine);
       }
     },
-    lyricTouchMove () {},
     change () {
       this.showCard = !this.showCard;
       if (!this.showCard) {
