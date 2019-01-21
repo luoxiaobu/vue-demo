@@ -47,10 +47,10 @@
             </div>
           </div>
           <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
-            <div class="lyric-wrapper" v-if="currentLyric" @touchmove.stop="lyricTouchMove">
+            <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" touchend="lyricTouchEnd">
               <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
-                v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
-                <div class="showTimeLine" :style="showTimeHeight"></div>
+                v-for="(line,index) in currentLyric.lines">{{line.showTime + line.txt}}</p>
+                <div class="showTimeLine" :style="showTimeHeight">{{showTime}}</div>
             </div>
             <div v-else class="no-Lyric">
               {{playingLyric}}
@@ -136,7 +136,8 @@ export default {
       listenScroll: true,
       listHeight: [],
       showTimeLine: 1,
-      scrollY: 0
+      scrollY: 0,
+      touch: {}
     }
   },
   components: {
@@ -178,6 +179,13 @@ export default {
     },
     showTimeHeight () {
       return `top: ${BASE - 0.5 * TITLE_HEIGHT}px`
+    },
+    showTime () {
+      if (this.currentLyric) {
+        return this.currentLyric.lines[this.showTimeLine].showTime
+      } else {
+        return 0;
+      }
     }
   },
   watch: {
@@ -207,13 +215,23 @@ export default {
     scroll (pos) {
       this.scrollY = pos.y
     },
+    lyricTouchStart (event) {
+      this.touch = {
+        initiated: true
+      }
+    },
     lyricTouchMove () {
+      if (!this.touch.initiated) {
+        return
+      }
       if (this.scrollY >= this.listHeight[this.showTimeLine] || this.scrollY <= this.listHeight[this.showTimeLine - 1]) {
         this.showTimeLine = this.listHeight.findIndex((item) => {
           return this.scrollY + BASE < item
         })
-        console.log(this.showTimeLine);
       }
+    },
+    lyricTouchEnd () {
+      this.touch.initiated = false;
     },
     change () {
       this.showCard = !this.showCard;
@@ -254,7 +272,7 @@ export default {
       })
     },
     handleLyric (index) {
-      if (index > SHOW_LINE) {
+      if (index > SHOW_LINE && !this.touch.initiated) {
         var scrollLyricHeight = (index - SHOW_LINE) * TITLE_HEIGHT;
         this.$refs.lyricList && this.$refs.lyricList.scrollTo(scrollLyricHeight);
       }

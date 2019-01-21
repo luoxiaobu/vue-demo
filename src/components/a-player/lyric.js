@@ -48,7 +48,8 @@ function filterLines (lyric) {
     if (result && txt) {
       lines.push({
         time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3] || 0) * 10,
-        txt
+        txt,
+        showTime: `${result[1]}:${result[2]}:${result[3] || '00'}`
       })
     }
   })
