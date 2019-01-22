@@ -27,23 +27,41 @@
             <div class="right-button" @click.stop="showPlay(SHOW_MODE.MINI)">mini</div>
           </div>
         </div>
-        <div class="normal-middle">
-          <div class="play-card" ref="cdWrapper">
-            <div class="song-rollwrap">
-              <div :class="[playStatus,'singer-card']">
-                <img class="image" width="100%" height="100%" :src="currentSong.image">
+        <div class="normal-middle" @click="change">
+          <div class="normal-middle-card" v-show="showCard">
+            <div class="play-card" ref="cdWrapper">
+              <div class="song-rollwrap" @click.stop="togglePlaying">
+                <div :class="[playStatus,'singer-card']">
+                  <img class="image" width="100%" height="100%" :src="currentSong.image">
+                </div>
+              </div>
+              <div class="play-button" @click.stop="togglePlaying">
+                <i class="icon-play-mini" v-show="!playing"></i>
               </div>
             </div>
-            <div class="play-button" @click.stop="togglePlaying">
-              <i class="icon-play-mini" v-show="!playing"></i>
+            <div class="playing-lyric-wrapper">
+              <div class="song-singer">
+                <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
+              </div>
+              <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
-          <div class="lyric-wrapper">
-            <div class="song-singer">
-              <span class="song" v-html="currentSong.name"></span> - <span class="singer" v-html="currentSong.singer"></span>
+          <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
+            <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" @touchend="lyricTouchEnd">
+              <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
+                v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+                <div class="show-time-line" :style="showTimeStyle" v-show="touch.initiated">
+                  <div class="lyric-detail">
+                    <div class="icon icon-play"></div>
+                    <div class="lyric-line"></div>
+                    <div class="lyric-time">{{showTime}}</div>
+                  </div>
+                </div>
             </div>
-            <div class="playing-lyric">{{playingLyric}}</div>
-          </div>
+            <div v-else class="no-Lyric">
+              {{playingLyric}}
+            </div>
+          </a-scroll>
         </div>
         <div class="normal-bottom">
           <progress-bar :total-time="currentSong.duration" :current-time="currentTime" @timeChange="onTimeChange"></progress-bar>
@@ -51,13 +69,13 @@
             <div class="icon" @click.stop="changeMode">
               <i :class="iconMode[playMode]"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="prevSong" class="icon-prev"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="togglePlaying" :class="[playIcon, 'i-center']"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="nextSong" class="icon-next"></i>
             </div>
             <div class="icon">
@@ -103,9 +121,13 @@ import { prefixStyle, shuffle } from '@/utils/tools.js';
 import { getTranslate, transitionEndEvent } from '@/utils/animation';
 import progressBar from 'components/common/ProgressBar';
 import progressCircle from 'components/common/ProgressCircle';
+import aScroll from 'components/common/AScroll';
 import Lyric from 'components/a-player/lyric'
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
+const TITLE_HEIGHT = 30;
+const SHOW_LINE = 5;
+const BASE = (6 + 0.5) * TITLE_HEIGHT
 
 export default {
   data () {
@@ -115,11 +137,17 @@ export default {
       currentTime: 0,
       radius: 30,
       iconMode,
-      currentLyric: null
+      currentLyric: null,
+      showCard: true,
+      listenScroll: true,
+      listHeight: [],
+      showTimeLine: 1,
+      scrollY: 0,
+      touch: {}
     }
   },
   components: {
-    progressBar, progressCircle
+    progressBar, progressCircle, aScroll
   },
   computed: {
     ...mapGetters([
@@ -147,10 +175,25 @@ export default {
       return this.currentTime / this.currentSong.duration
     },
     playingLyric () {
-      return this.currentLyric ? this.currentLyric.currentTxt : '...'
+      return this.currentLyric ? this.currentLyric.currentTxt : '歌词加载中...'
     },
     nextLyricTime () {
       return this.currentLyric ? this.currentLyric.nextTime : 0
+    },
+    currentLineNum () {
+      return this.currentLyric ? this.currentLyric.currentIndex : 0
+    },
+    showTimeStyle () {
+      return {
+        top: `${BASE}px`
+      }
+    },
+    showTime () {
+      if (this.currentLyric) {
+        return this.currentLyric.lines[this.showTimeLine].showTime
+      } else {
+        return 0;
+      }
     }
   },
   watch: {
@@ -162,6 +205,7 @@ export default {
         return
       }
       this.currentLyric = null;
+      this.listHeight = [];
       this.getLyric();
     }
   },
@@ -176,15 +220,77 @@ export default {
     ...mapActions([
       'randomPlay'
     ]),
+    scroll (pos) {
+      this.scrollY = pos.y
+    },
+    lyricTouchStart (event) {
+      this.touch = {
+        initiated: true
+      }
+    },
+    lyricTouchMove () {
+      if (!this.touch.initiated) {
+        return
+      }
+      if (this.scrollY < this.listHeight[this.showTimeLine] && this.scrollY > this.listHeight[this.showTimeLine - 1]) {
+        return
+      }
+      if (this.scrollY >= this.listHeight[this.showTimeLine] || this.scrollY <= this.listHeight[this.showTimeLine - 1]) {
+        this.showTimeLine = this.listHeight.findIndex((item) => {
+          return this.scrollY + BASE < item
+        })
+      }
+    },
+    lyricTouchEnd () {
+      this.touch.initiated = false;
+    },
+    change () {
+      this.showCard = !this.showCard;
+      if (!this.showCard) {
+        this.$nextTick(() => {
+          this.handleLyric(this.currentLineNum);
+          this.calculateHeight();
+        })
+      }
+    },
+    calculateHeight () {
+      if (this.showCard) {
+        return;
+      }
+      if (this.listHeight.length > 0 || !this.currentLyric) {
+        return;
+      }
+      const list = this.$refs.oneLyric;
+      let height = 0;
+      for (let i = 0; i < list.length - 1; i++) {
+        let item = list[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
     getLyric () {
       this.currentSong.getLyric().then((lyric) => {
         if (this.currentSong.lyric !== lyric) {
           return
         }
-        this.currentLyric = new Lyric(lyric)
+        this.currentLyric = new Lyric(lyric, this.handleLyric);
+        this.$nextTick(() => {
+          this.showTimeLine = 1;
+          this.calculateHeight()
+        })
       }).catch(() => {
-        this.currentLyric = null
+        this.currentLyric = null;
+        this.listHeight = [];
       })
+    },
+    handleLyric (index) {
+      if (this.showCard) {
+        return;
+      }
+      if (index > SHOW_LINE && !this.touch.initiated) {
+        var scrollLyricHeight = (index - SHOW_LINE) * TITLE_HEIGHT;
+        this.$refs.lyricList && this.$refs.lyricList.scrollTo(scrollLyricHeight);
+      }
     },
     random () {
       this.randomPlay(this.sequenceList)
@@ -281,28 +387,57 @@ export default {
       }
       this.songReady = false
     },
-    beforeEnter: function (el) {
+    lyricTransition (atrr, value, done) {
+      var el = this.$refs.lyricList && this.$refs.lyricList.$el;
+      if (!el) {
+        done && done()
+        return
+      }
+      done && el.addEventListener(transitionEndEvent, done);
+      el.style[atrr] = value
+    },
+    beforeEnter (el) {
+      if (!this.showCard) {
+        this.lyricTransition('opacity', 0)
+        return
+      }
       const {x, y, scale} = this._getPosAndScale();
       this.$refs.cdWrapper.style[transform] = `${getTranslate(`${x}px`, `${y}px`, 0)} scale(${scale})`
     },
     enter (el, done) {
+      if (!this.showCard) {
+        this.lyricTransition('transition', 'all 0.4s')
+        this.lyricTransition('opacity', 1, done)
+        return
+      }
       this.$refs.cdWrapper.style[transition] = 'all 0.4s';
-      // 强制动画刷新？
-      this._getPosAndScale();
       this.$refs.cdWrapper.style[transform] = `${getTranslate(`${0}px`, `${0}px`, 0)} scale(1)`
       this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
     },
     afterEnter () {
+      if (!this.showCard) {
+        this.lyricTransition('transition', '')
+        return
+      }
       this.$refs.cdWrapper.style[transition] = ''
       this.$refs.cdWrapper.style[transform] = ''
     },
     leave (el, done) {
-      this.$refs.cdWrapper.style[transition] = 'all 0.4s'
+      if (!this.showCard) {
+        this.lyricTransition('transition', 'all 0.4s')
+        this.lyricTransition('opacity', 0, done)
+        return
+      }
+      this.$refs.cdWrapper.style[transition] = 'all 0.4s';
       const {x, y, scale} = this._getPosAndScale()
       this.$refs.cdWrapper.style[transform] = `${getTranslate(`${x}px`, `${y}px`, 0)} scale(${scale})`
       this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
     },
     afterLeave () {
+      if (!this.showCard) {
+        this.lyricTransition('transition', '')
+        return
+      }
       this.$refs.cdWrapper && (this.$refs.cdWrapper.style[transition] = '')
       this.$refs.cdWrapper && (this.$refs.cdWrapper.style[transform] = '')
     },
@@ -432,10 +567,12 @@ export default {
         font-size: 40px;
       }
     }
-    .lyric-wrapper {
+    .lyric-wrapper , .playing-lyric-wrapper {
       padding: 0 35px;
-      margin-top: 25px;
       text-align: center;
+    }
+    .playing-lyric-wrapper {
+      margin-top: 25px;
       font-size: $font-size-small;
       color: $color-text-gr;
       .playing-lyric {
@@ -443,6 +580,50 @@ export default {
         line-height: 20px;
         font-size: $font-size-medium;
         color: $color-text-light;
+      }
+    }
+    .lyric-wrapper {
+      .text {
+        line-height: 30px;
+        color: rgba(225,225,225,.6);
+        font-size: $font-size-medium
+        &.current {
+          color: $color-text-light;
+        }
+      }
+    }
+    .no-Lyric {
+      text-align: center;
+      color: $color-text-light;
+      font-size: $font-size-medium;
+      position-center(relative)
+    }
+    .show-time-line {
+      position: absolute;
+      left:0;
+      right: 0;
+      margin: 0 20px;
+      opacity: 0.8;
+      .lyric-detail {
+        position-center(absolute);
+        display: flex;
+        width: 100%;
+        align-items: center;
+        height: 30px;
+      }
+      .icon-play {
+        color: $color-pink;
+      }
+      .lyric-line {
+        height: 0;
+        flex: 1;
+        border-bottom: 2px solid $color-pink;
+      }
+      .lyric-time {
+        font-size: $font-size-small;
+        color: #fff;
+        min-width: 55px;
+        text-align: right;
       }
     }
   }
