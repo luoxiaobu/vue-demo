@@ -46,17 +46,19 @@
               <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
+          <div class="show-time-line" :style="showTimeStyle" v-show="!showCard&&touch.moveTime">
+            <div class="lyric-detail">
+              <div class="icon icon-play"></div>
+              <div class="lyric-line"></div>
+              <div class="lyric-time">{{showTime}}</div>
+            </div>
+          </div>
           <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
-            <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" @touchend="lyricTouchEnd">
+            <div class="lyric-wrapper" v-if="currentLyric" @touchstart="lyricTouchStart" @touchmove="lyricTouchMove" @touchend="lyricTouchEnd">
+              <div :style="block"></div>
               <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
                 v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
-                <div class="show-time-line" :style="showTimeStyle" v-show="touch.initiated">
-                  <div class="lyric-detail">
-                    <div class="icon icon-play"></div>
-                    <div class="lyric-line"></div>
-                    <div class="lyric-time">{{showTime}}</div>
-                  </div>
-                </div>
+              <div :style="block"></div>
             </div>
             <div v-else class="no-Lyric">
               {{playingLyric}}
@@ -126,8 +128,10 @@ import Lyric from 'components/a-player/lyric'
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 const TITLE_HEIGHT = 30;
-const SHOW_LINE = 5;
-const BASE = (6 + 0.5) * TITLE_HEIGHT
+const BASE_NUME = 6
+const HARF_LINE = 0.5
+const BASE = (BASE_NUME + HARF_LINE) * TITLE_HEIGHT;
+const delayTime = 300;
 
 export default {
   data () {
@@ -143,7 +147,8 @@ export default {
       listHeight: [],
       showTimeLine: 1,
       scrollY: 0,
-      touch: {}
+      touch: {},
+      timer: null
     }
   },
   components: {
@@ -188,7 +193,15 @@ export default {
         top: `${BASE}px`
       }
     },
+    block () {
+      return {
+        height: `${BASE_NUME * TITLE_HEIGHT}px`
+      }
+    },
     showTime () {
+      if (!this.touch.moveTime) {
+        return;
+      }
       if (this.currentLyric) {
         return this.currentLyric.lines[this.showTimeLine].showTime
       } else {
@@ -224,25 +237,33 @@ export default {
       this.scrollY = pos.y
     },
     lyricTouchStart (event) {
+      clearTimeout(this.timer);
       this.touch = {
-        initiated: true
+        initiated: true,
+        startTime: new Date(),
+        moveTime: 0
       }
     },
     lyricTouchMove () {
       if (!this.touch.initiated) {
         return
       }
-      if (this.scrollY < this.listHeight[this.showTimeLine] && this.scrollY > this.listHeight[this.showTimeLine - 1]) {
+      this.touch.moveTime = new Date();
+      var tempHeight = this.scrollY + HARF_LINE * TITLE_HEIGHT;
+      if (tempHeight < this.listHeight[this.showTimeLine] && tempHeight > this.listHeight[this.showTimeLine - 1]) {
         return
       }
-      if (this.scrollY >= this.listHeight[this.showTimeLine] || this.scrollY <= this.listHeight[this.showTimeLine - 1]) {
+      if (tempHeight >= this.listHeight[this.showTimeLine] || tempHeight <= this.listHeight[this.showTimeLine - 1]) {
         this.showTimeLine = this.listHeight.findIndex((item) => {
-          return this.scrollY + BASE < item
+          return tempHeight < item
         })
       }
     },
     lyricTouchEnd () {
       this.touch.initiated = false;
+      this.timer = setTimeout(() => {
+        this.touch.moveTime = 0;
+      }, delayTime)
     },
     change () {
       this.showCard = !this.showCard;
@@ -287,8 +308,8 @@ export default {
       if (this.showCard) {
         return;
       }
-      if (index > SHOW_LINE && !this.touch.initiated) {
-        var scrollLyricHeight = (index - SHOW_LINE) * TITLE_HEIGHT;
+      if (!this.touch.initiated) {
+        var scrollLyricHeight = index * TITLE_HEIGHT;
         this.$refs.lyricList && this.$refs.lyricList.scrollTo(scrollLyricHeight);
       }
     },

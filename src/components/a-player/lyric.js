@@ -49,7 +49,7 @@ function filterLines (lyric) {
       lines.push({
         time: result[1] * 60 * 1000 + result[2] * 1000 + (result[3] || 0) * 10,
         txt,
-        showTime: `${result[1]}:${result[2]}:${result[3] || '00'}`
+        showTime: `${result[1]}:${result[2]}`
       })
     }
   })
