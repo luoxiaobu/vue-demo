@@ -47,10 +47,10 @@
             </div>
           </div>
           <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
-            <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" touchend="lyricTouchEnd">
+            <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" @touchend="lyricTouchEnd">
               <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
                 v-for="(line,index) in currentLyric.lines">{{line.showTime + line.txt}}</p>
-                <div class="showTimeLine" :style="showTimeHeight">{{showTime}}</div>
+                <div class="show-time-line" :style="showTimeStyle">{{showTime}}</div>
             </div>
             <div v-else class="no-Lyric">
               {{playingLyric}}
@@ -177,8 +177,11 @@ export default {
     currentLineNum () {
       return this.currentLyric ? this.currentLyric.currentIndex : 0
     },
-    showTimeHeight () {
-      return `top: ${BASE - 0.5 * TITLE_HEIGHT}px`
+    showTimeStyle () {
+      return {
+        top: `${BASE}px`,
+        height: `${0.5 * TITLE_HEIGHT}px`
+      }
     },
     showTime () {
       if (this.currentLyric) {
@@ -272,6 +275,9 @@ export default {
       })
     },
     handleLyric (index) {
+      if (this.showCard) {
+        return;
+      }
       if (index > SHOW_LINE && !this.touch.initiated) {
         var scrollLyricHeight = (index - SHOW_LINE) * TITLE_HEIGHT;
         this.$refs.lyricList && this.$refs.lyricList.scrollTo(scrollLyricHeight);
@@ -415,7 +421,6 @@ export default {
       }
       this.$refs.cdWrapper.style[transition] = 'all 0.4s';
       const {x, y, scale} = this._getPosAndScale()
-      console.log(this.$refs.cdWrapper);
       this.$refs.cdWrapper.style[transform] = `${getTranslate(`${x}px`, `${y}px`, 0)} scale(${scale})`
       this.$refs.cdWrapper.addEventListener(transitionEndEvent, done)
     },
@@ -584,11 +589,11 @@ export default {
       font-size: $font-size-medium;
       position-center(relative)
     }
-    .showTimeLine {
+    .show-time-line {
       position: absolute;
       width: 100%;
-      height 0px;
-      border-top: 3px solid $color-pink;
+      opacity: 0.8;
+      border-bottom: 2px solid $color-pink;
     }
   }
   .normal-bottom {
