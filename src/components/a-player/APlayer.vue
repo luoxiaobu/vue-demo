@@ -49,8 +49,14 @@
           <a-scroll v-show="!showCard" top="0" class="normal-middle-lyric" ref="lyricList" @scroll="scroll" :listen-scroll="listenScroll">
             <div class="lyric-wrapper" v-if="currentLyric" @touchstart.stop="lyricTouchStart" @touchmove.stop="lyricTouchMove" @touchend="lyricTouchEnd">
               <p ref="oneLyric" :class="['text',{'current': currentLineNum ===index}]" :key="index"
-                v-for="(line,index) in currentLyric.lines">{{line.showTime + line.txt}}</p>
-                <div class="show-time-line" :style="showTimeStyle">{{showTime}}</div>
+                v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+                <div class="show-time-line" :style="showTimeStyle" v-show="touch.initiated">
+                  <div class="lyric-detail">
+                    <div class="icon icon-play"></div>
+                    <div class="lyric-line"></div>
+                    <div class="lyric-time">{{showTime}}</div>
+                  </div>
+                </div>
             </div>
             <div v-else class="no-Lyric">
               {{playingLyric}}
@@ -63,13 +69,13 @@
             <div class="icon" @click.stop="changeMode">
               <i :class="iconMode[playMode]"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="prevSong" class="icon-prev"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="togglePlaying" :class="[playIcon, 'i-center']"></i>
             </div>
-            <div class="icon" :class="disableCls">
+            <div :class="['icon',disableCls]">
               <i @click="nextSong" class="icon-next"></i>
             </div>
             <div class="icon">
@@ -121,7 +127,7 @@ const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 const TITLE_HEIGHT = 30;
 const SHOW_LINE = 5;
-const BASE = 6 * TITLE_HEIGHT
+const BASE = (6 + 0.5) * TITLE_HEIGHT
 
 export default {
   data () {
@@ -179,8 +185,7 @@ export default {
     },
     showTimeStyle () {
       return {
-        top: `${BASE}px`,
-        height: `${0.5 * TITLE_HEIGHT}px`
+        top: `${BASE}px`
       }
     },
     showTime () {
@@ -227,6 +232,9 @@ export default {
       if (!this.touch.initiated) {
         return
       }
+      if (this.scrollY < this.listHeight[this.showTimeLine] && this.scrollY > this.listHeight[this.showTimeLine - 1]) {
+        return
+      }
       if (this.scrollY >= this.listHeight[this.showTimeLine] || this.scrollY <= this.listHeight[this.showTimeLine - 1]) {
         this.showTimeLine = this.listHeight.findIndex((item) => {
           return this.scrollY + BASE < item
@@ -267,6 +275,7 @@ export default {
         }
         this.currentLyric = new Lyric(lyric, this.handleLyric);
         this.$nextTick(() => {
+          this.showTimeLine = 1;
           this.calculateHeight()
         })
       }).catch(() => {
@@ -591,9 +600,31 @@ export default {
     }
     .show-time-line {
       position: absolute;
-      width: 100%;
+      left:0;
+      right: 0;
+      margin: 0 20px;
       opacity: 0.8;
-      border-bottom: 2px solid $color-pink;
+      .lyric-detail {
+        position-center(absolute);
+        display: flex;
+        width: 100%;
+        align-items: center;
+        height: 30px;
+      }
+      .icon-play {
+        color: $color-pink;
+      }
+      .lyric-line {
+        height: 0;
+        flex: 1;
+        border-bottom: 2px solid $color-pink;
+      }
+      .lyric-time {
+        font-size: $font-size-small;
+        color: #fff;
+        min-width: 55px;
+        text-align: right;
+      }
     }
   }
   .normal-bottom {
