@@ -34,3 +34,19 @@ export function getPlaylist () {
     params: reallyData
   })
 }
+
+export function getSongList (disstid) {
+  const url = '/api/getSongList'
+  var reallyData = Object.assign({}, qqyBase, {
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    disstid,
+    format: 'json',
+    platform: 'yqq.json'
+  })
+  return requestIns(url, {
+    params: reallyData
+  })
+}

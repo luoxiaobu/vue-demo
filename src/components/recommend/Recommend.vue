@@ -1,27 +1,31 @@
 <template>
-  <a-scroll class="recommend">
-    <a-slider v-if="recommendList.length" :pages="recommendList"></a-slider>
-    <div class="recommend-list">
-      <h1 class="list-title">热门歌单推荐</h1>
-      <ul class="wrap-item">
-        <li v-for="item in discList" class="item flexbox" :key="item.dissid">
-          <div class="icon">
-            <img width="70" height="70" v-lazy="item.imgurl">
-          </div>
-          <div class="text flexbox">
-            <h2 class="name">{{item.creator.name}}</h2>
-            <p class="desc">{{item.dissname}}</p>
-          </div>
-          <div class="item-arrow">
-          </div>
-        </li>
-      </ul>
-    </div>
-  </a-scroll>
+  <div class="recommend">
+    <a-scroll>
+      <a-slider v-if="recommendList.length" :pages="recommendList"></a-slider>
+      <div class="recommend-list">
+        <h1 class="list-title">热门歌单推荐</h1>
+        <ul class="wrap-item">
+          <li @click="selectItem(item)" v-for="item in discList" class="item flexbox" :key="item.dissid">
+            <div class="icon">
+              <img width="70" height="70" v-lazy="item.imgurl">
+            </div>
+            <div class="text flexbox">
+              <h2 class="name">{{item.creator.name}}</h2>
+              <p class="desc">{{item.dissname}}</p>
+            </div>
+            <div class="item-arrow">
+            </div>
+          </li>
+        </ul>
+      </div>
+    </a-scroll>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
 import { getRecommend, getPlaylist } from 'service/recommend'
+import { mapMutations } from 'vuex'
 import ASlider from 'components/common/ASlider'
 import AScroll from 'components/common/AScroll'
 export default {
@@ -35,6 +39,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setRecommend: 'SET_RECOMMEND'
+    }),
     getRecommend () {
       getRecommend().then((data) => {
         this.recommendList = data.slider;
@@ -44,6 +51,12 @@ export default {
       getPlaylist().then((data) => {
         this.discList = data.list;
       }).catch(() => {})
+    },
+    selectItem (item) {
+      this.setRecommend(item)
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
     }
   },
   created () {
