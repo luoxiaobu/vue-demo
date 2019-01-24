@@ -6,6 +6,7 @@
           <div class="back-arrow"></div>
           <div class="left-title">返回</div>
         </div>
+        <h1 class="title" v-html="title"></h1>
       </div>
       <div v-else class="ban-back dark" key="dark">
         <div class="left-button" @click.stop="back">
@@ -138,6 +139,7 @@ export default {
     line-height: $bar-height;
     height: $bar-height;
     z-index: 2;
+    text-align: center;
     .left-button {
       position: absolute;
     }
@@ -150,9 +152,18 @@ export default {
     .back-arrow {
       normal-arrow($color-pink,-45deg);
     }
+    .title {
+      font-size: $font-size-medium-x;
+      color: $color-text-d;
+      no-wrap();
+    }
+  }
+  .white {
+    .title {
+      color: $color-pink;
+    }
   }
   .dark {
-    text-align: center;
     background: $color-highlight-background;
     .left-title {
       color: $color-text-d;
@@ -160,10 +171,6 @@ export default {
     .back-arrow {
       border-top: 1px solid $color-text-d;
       border-left: 1px solid $color-text-d;
-    }
-    .title {
-      font-size: $font-size-medium-x;
-      color: $color-text-d;
     }
   }
   .bg-image {

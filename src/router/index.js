@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Recommend from '@/components/recommend/Recommend'
+import RecommendDetail from '@/components/recommend-detail/RecommendDetail'
 import Singer from '@/components/singer/Singer'
 import SingerDetail from '@/components/singer-detail/SingerDetail'
 import Rank from '@/components/rank/Rank'
@@ -14,7 +15,11 @@ export default new Router({
     redirect: '/recommend'
   }, {
     path: '/recommend',
-    component: Recommend
+    component: Recommend,
+    children: [{
+      path: ':dissid',
+      component: RecommendDetail
+    }]
   }, {
     path: '/singer',
     component: Singer,

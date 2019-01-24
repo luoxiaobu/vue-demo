@@ -13,3 +13,6 @@ export const SET_PLAY_MODE = 'SET_PLAY_MODE'
 export const SET_CURRENT_INDEX = 'SET_CURRENT_INDEX'
 
 export const SET_SHOW_MODE = 'SET_SHOW_MODE'
+
+// recommend
+export const SET_RECOMMEND = 'SET_RECOMMEND'
