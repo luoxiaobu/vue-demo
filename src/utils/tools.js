@@ -53,6 +53,11 @@ export function dataLeftCompleting (bits, identifier, value) {
   return value.slice(-bits);
 }
 
+export function dataRightCompleting (bits, identifier, value) {
+  value = value + Array(bits + 1).join(identifier);
+  return value.slice(bits);
+}
+
 /**
  * shuffle (disrupt array order)
  * @param { array }
@@ -75,4 +80,34 @@ export function findIndex (list, song) {
   return list.findIndex((item) => {
     return item.id === song.id
   })
+}
+
+/**
+ * toFixedN
+ * @param {number} value
+ * @param {number} n
+ */
+export function toFixedN (value, n) {
+  if (isNaN(value)) {
+    return
+  }
+  var number = Number(value).toString();
+  var numberArr = number.split('.');
+  var intNum = numberArr[0]; // 整数部分
+  var deciNum = numberArr[1]; // 小数部分
+  var temp;
+  if (!n && n !== 0) {
+    return value
+  }
+  if (n === 0) {
+    return +intNum
+  } else if (n > 0) {
+    if (!deciNum || n >= deciNum.length) {
+      return +(intNum + '.' + dataRightCompleting(n, 0, +(deciNum)))
+    } else {
+      temp = (+deciNum[n]) >= 5 ? 1 : 0;
+      return +(intNum + '.' + (+deciNum.slice(0, n) + temp))
+    }
+  }
+  return value
 }
