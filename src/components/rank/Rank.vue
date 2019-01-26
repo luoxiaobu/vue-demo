@@ -1,7 +1,8 @@
 <template>
-    <a-scroll class="rank">
+  <div class="rank">
+    <a-scroll>
       <ul class="wrap-item">
-        <li v-for="item in topList" class="item flexbox" :key="item.id">
+        <li  @click="selectItem(item)" v-for="item in topList" class="item flexbox" :key="item.id">
           <div class="icon">
             <img width="90" height="90" v-lazy="item.picUrl">
           </div>
@@ -17,10 +18,13 @@
         </li>
       </ul>
     </a-scroll>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
 import { getTopList } from 'service/rank'
+import { mapMutations } from 'vuex'
 import AScroll from 'components/common/AScroll'
 export default {
   components: {
@@ -32,10 +36,19 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setTopList: 'SET_TOP_LIST'
+    }),
     getTopList () {
       getTopList().then((data) => {
         this.topList = data.topList;
       }).catch(() => {})
+    },
+    selectItem (item) {
+      this.setTopList(item)
+      this.$router.push({
+        path: `/rank/${item.id}`
+      })
     }
   },
   created () {
@@ -44,12 +57,12 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style scoped lang="stylus">
 @import "../../themes/variable"
 @import "../../themes/mixin"
 .rank {
   .wrap-item {
-    padding: 0 10px;
+    padding: 10px 10px;
   }
   .item {
     align-items: center;

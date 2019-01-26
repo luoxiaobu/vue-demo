@@ -2,6 +2,7 @@
   <div class="song-list">
     <ul>
       <li @click="selectItem(song, index)" class="item" v-for="(song, index) in displaySongs" :key ="song.id">
+        <div class="list-order">{{index + 1}}</div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{song.displaySong}}</p>
@@ -30,7 +31,9 @@ export default {
   },
   methods: {
     selectItem (item, index) {
-      this.$emit('select', item, index)
+      if (item.url) {
+        this.$emit('select', item, index)
+      }
     }
   }
 }
@@ -44,6 +47,9 @@ export default {
     align-items: center;
     height: 64px;
     font-size: $font-size-medium;
+    .list-order {
+      width: 30px;
+    }
     .content {
       flex: 1;
       line-height: 20px;

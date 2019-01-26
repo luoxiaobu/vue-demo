@@ -16,3 +16,6 @@ export const SET_SHOW_MODE = 'SET_SHOW_MODE'
 
 // recommend
 export const SET_RECOMMEND = 'SET_RECOMMEND'
+
+// rank
+export const SET_TOP_LIST = 'SET_TOP_LIST'
