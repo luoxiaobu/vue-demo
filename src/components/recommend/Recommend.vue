@@ -5,15 +5,17 @@
       <div class="recommend-list">
         <h1 class="list-title">热门歌单推荐</h1>
         <ul class="wrap-item">
-          <li @click="selectItem(item)" v-for="item in discList" class="item flexbox" :key="item.dissid">
-            <div class="icon">
-              <img width="70" height="70" v-lazy="item.imgurl">
-            </div>
-            <div class="text flexbox">
-              <h2 class="name">{{item.creator.name}}</h2>
+          <li v-for="item in discList" class="item" :key="item.dissid" @click="selectItem(item)">
+            <div class="card">
+              <div class="card-icon">
+                <img width="100%" v-lazy="item.imgurl">
+                <div class="play-volume">
+                  <i class="icon icon-headset"></i>
+                  <span class="play-num">{{item.listennum | tenThousand}}</span>
+                </div>
+              </div>
               <p class="desc">{{item.dissname}}</p>
-            </div>
-            <div class="item-arrow">
+              <h2 class="name">{{item.creator.name}}</h2>
             </div>
           </li>
         </ul>
@@ -28,6 +30,7 @@ import { getRecommend, getPlaylist } from 'service/recommend'
 import { mapMutations } from 'vuex'
 import ASlider from 'components/common/ASlider'
 import AScroll from 'components/common/AScroll'
+import { toFixedN } from '@/utils/tools'
 export default {
   components: {
     ASlider, AScroll
@@ -36,6 +39,11 @@ export default {
     return {
       recommendList: [],
       discList: []
+    }
+  },
+  filters: {
+    tenThousand: function (value) {
+      return `${toFixedN(value / 10000, 2)}万`;
     }
   },
   methods: {
@@ -70,6 +78,7 @@ export default {
 @import "../../themes/variable"
 @import "../../themes/mixin"
 .recommend {
+  background-color: $background-color-theme;
   .list-title {
     padding-left: 9px;
     margin-bottom: 14px;
@@ -82,41 +91,45 @@ export default {
     color: $color-text-dark;
     padding-top: 20px;
     .wrap-item {
-      padding: 0 10px;
+      padding-left: 10px;
+      display: flex;
+      flex-wrap: wrap;
     }
     .item {
+      width: 50%;
+      padding-right: 10px;
       align-items: center;
       margin-bottom: 10px;
+    }
+    .card {
       background-color: #fff;
-    }
-    .text {
-      flex-direction: column
-      justify-content: center
-      flex: 1
-      line-height: 20px
-      overflow: hidden
-      font-size: $font-size-medium
-    }
-    .item-arrow {
-      position: relative;
-      left: -4px;
-      width: 8px;
-      height: 8px;
-      border-right: 1px solid #cac5c5;
-      border-bottom: 1px solid #cac5c5;
-      transform: rotate(-45deg);
-    }
-    .icon {
-      width: 80px
-      padding-right: 20px
-    }
-    .name {
-      margin-bottom: 10px;
-      no-wrap()
-    }
-    .desc {
-      color: $color-text-d;
-      no-wrap()
+      .card-icon {
+        position: relative;
+      }
+      .play-volume {
+        position: absolute;
+        right: 4px;
+        top: 0px;
+        color: #fff;
+      }
+      .play-num {
+        font-size:$font-size-medium;
+      }
+      .icon {
+        font-weight: bold;
+      }
+      .name {
+        line-height: 20px
+        padding-bottom: 8px;
+        font-size: $font-size-small-s
+        no-wrap()
+      }
+      .desc {
+        line-height: 20px
+        color: $color-text-d;
+        font-size: $font-size-medium
+        no-wrap()
+      }
     }
   }
 }

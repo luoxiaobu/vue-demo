@@ -17,6 +17,9 @@
       </div>
     </transition>
     <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
+    <div class="album" v-if="!listenPull">
+      <slot></slot>
+    </div>
     <a-scroll :top="scrollHeight" @pull="pull" :listen-pull="listenPull" @scroll="scroll" :listen-scroll="listenScroll">
       <div :style="layerStyle" ref="layer"></div>
       <song-list class="song-wrapper" :songs="songs" @select="selectItem"></song-list>
@@ -36,7 +39,6 @@ export default {
       imageHeight: '0px',
       scrollY: 0,
       listenScroll: true,
-      listenPull: true,
       showLight: true,
       translateY: 0,
       scale: 1,
@@ -55,6 +57,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    listenPull: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -183,6 +189,12 @@ export default {
     *  attention
     */
     transform-origin: top;
+  }
+  .album {
+    position: absolute;
+    padding-top: 70%;
+    height: 0;
+    width: 100%;
   }
   .song-wrapper {
     background-color: $background-color-theme;

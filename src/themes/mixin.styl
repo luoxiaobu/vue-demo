@@ -22,3 +22,16 @@ position-center($position) {
   top: 50%;
   transform: translate(-50%,-50%);
 }
+
+/*!
+ * interesting Multiple lines clamp
+ */
+line-clamp($line-height,$line,$font-size) {
+  max-height: $font-size * $line * $line-height + 1;
+  line-height: $line-height;
+  overflow: hidden;
+  font-size: $font-size;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $line;
+}

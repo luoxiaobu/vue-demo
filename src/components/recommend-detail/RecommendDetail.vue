@@ -8,18 +8,24 @@
 
 <script>
 import musicList from 'components/music-list/MusicList';
-import { mapGetters } from 'vuex';
-import { getplaysongvkey } from 'service/song';
+import { mapGetters, mapMutations } from 'vuex';
 import { getSongList } from 'service/recommend';
-import { createSong } from 'components/singer-detail/song';
+import { normalizeSongsMixin } from '@/utils/mixin';
 export default {
   data () {
     return {
-      songList: []
+      songList: [],
+      songData: {}
     }
   },
   components: {
     musicList
+  },
+  mixins: [normalizeSongsMixin],
+  props: {
+    dissid: {
+      type: String
+    }
   },
   computed: {
     ...mapGetters(['getRecommend']),
@@ -31,42 +37,23 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setRecommend: 'SET_RECOMMEND'
+    }),
     getSongList () {
-      let id = this.getRecommend.dissid;
+      let id = this.getRecommend.dissid || (this.dissid);
       if (!id) {
         this.$router.push('/recommend');
       }
       getSongList(id).then((data) => {
-        this.normalizeSongs(data.cdlist[0].songlist);
-      }).catch(() => {})
-    },
-    normalizeSongs (list) {
-      let ret = [];
-      let songMids = [];
-      var keyinfo = {};
-      songMids = list.map((item) => {
-        return item.songmid;
-      })
-      list.forEach((item) => {
-        if (item.songid && item.albummid) {
-          keyinfo[item.songmid] = item;
-          ret.push(createSong(item))
+        this.songData = data.cdlist[0];
+        if (!this.bgImage) {
+          this.setRecommend({
+            dissname: this.songData.dissname,
+            imgurl: this.songData.logo
+          })
         }
-      })
-      this.songList = ret
-      getplaysongvkey(songMids).then((data) => {
-        let tempData = data.data;
-        let midurlinfo = (tempData && tempData.midurlinfo) || [];
-        let doma = (tempData && tempData.sip && tempData.sip[0]) || '';
-        let retHaveKey = [];
-        midurlinfo.forEach((item) => {
-          let musicData = keyinfo[item.songmid];
-          if (musicData) {
-            musicData.url = doma + item.purl;
-            retHaveKey.push(createSong(musicData))
-          }
-        })
-        this.songList = retHaveKey;
+        this.normalizeSongs(data.cdlist[0].songlist);
       }).catch(() => {})
     }
   },
