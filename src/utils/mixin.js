@@ -24,7 +24,7 @@ export const normalizeSongsMixin = {
         midurlinfo.forEach((item) => {
           let musicData = keyinfo[item.songmid];
           if (musicData) {
-            musicData.url = doma + item.purl;
+            musicData.url = item.purl ? doma + item.purl : '';
             retHaveKey.push(createSong(musicData))
           }
         })

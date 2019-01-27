@@ -22,7 +22,7 @@
     </div>
     <a-scroll :top="scrollHeight" @pull="pull" :listen-pull="listenPull" @scroll="scroll" :listen-scroll="listenScroll">
       <div :style="layerStyle" ref="layer"></div>
-      <song-list class="song-wrapper" :songs="songs" @select="selectItem"></song-list>
+      <song-list class="song-wrapper" :rank="rank" :songs="songs" @select="selectItem"></song-list>
     </a-scroll>
   </div>
 </template>
@@ -61,6 +61,10 @@ export default {
     listenPull: {
       type: Boolean,
       default: true
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

@@ -1,7 +1,7 @@
 <template>
   <transition name="slide">
     <div class="top-list">
-      <music-list :title="title" :bg-image="bgImage" :songs="songList" :listen-pull="listenPull">
+      <music-list :title="title" :rank="rank" :bg-image="bgImage" :songs="songList" :listen-pull="listenPull">
         <div class="banner">
           <div class="album-card flexbox">
             <img class="album-img" width="100%" :src="bgImage">
@@ -28,7 +28,8 @@ export default {
       songList: [],
       listenPull: false,
       topinfo: {},
-      updateTime: ''
+      updateTime: '',
+      rank: true
     }
   },
   components: {
