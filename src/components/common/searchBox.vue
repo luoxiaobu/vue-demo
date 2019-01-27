@@ -8,19 +8,30 @@
     <div v-show="showCancel" @click.stop="cancelSearch" class="cancel-btn">取消</div>
   </div>
 </template>
-
 <script>
 export default {
   props: {
     placeholder: {
       type: String,
       default: '搜索歌曲、歌手'
+    },
+    value: String,
+    showCancel: {
+      type: Boolean,
+      default: false
+    }
+  },
+  watch: {
+    query (val) {
+      this.$emit('input', val);
+    },
+    value (val) {
+      this.query = val;
     }
   },
   data () {
     return {
-      query: '',
-      showCancel: false
+      query: ''
     }
   },
   methods: {
@@ -31,13 +42,11 @@ export default {
       this.query = ''
     },
     focus () {
-      this.showCancel = true;
-      this.$emit('cancelSearch', this.showCancel)
+      this.$emit('cancelSearch', false)
     },
     cancelSearch () {
-      this.showCancel = false;
       this.query = '';
-      this.$emit('cancelSearch', this.showCancel)
+      this.$emit('cancelSearch', true)
     }
   },
   mounted () {}

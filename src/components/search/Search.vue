@@ -1,10 +1,10 @@
 <template>
   <div class="search">
-    <search-box @cancelSearch="showHotKey"></search-box>
+    <search-box v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
     <div class="hot-key" v-show="showHot">
       <h1 class="title">热门搜索</h1>
       <ul>
-        <li :class="['item',{'color-pick':index === 0}]" v-for="(item,index) in hotKey" :key="index">
+        <li @click="addQuery(item.k)" class="item" v-for="(item,index) in hotKey" :key="index">
           <span>{{item.k}}</span>
         </li>
       </ul>
@@ -22,7 +22,8 @@ export default {
   data () {
     return {
       hotKey: [],
-      showHot: true
+      showHot: true,
+      query: ''
     }
   },
   methods: {
@@ -32,7 +33,11 @@ export default {
       }).catch(() => {})
     },
     showHotKey (value) {
-      this.showHot = !value;
+      this.showHot = value;
+    },
+    addQuery (query) {
+      this.query = query
+      this.showHotKey(false);
     }
   },
   created () {
