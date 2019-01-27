@@ -5,7 +5,7 @@
       <input ref="query" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
       <i @click="clear" v-show="query" class="icon-cuowu"></i>
     </div>
-    <div v-show="showCancel" @click="cancelSearch" class="cancel-btn">取消</div>
+    <div v-show="showCancel" @click.stop="cancelSearch" class="cancel-btn">取消</div>
   </div>
 </template>
 
@@ -32,10 +32,12 @@ export default {
     },
     focus () {
       this.showCancel = true;
+      this.$emit('cancelSearch', this.showCancel)
     },
     cancelSearch () {
       this.showCancel = false;
       this.query = '';
+      this.$emit('cancelSearch', this.showCancel)
     }
   },
   mounted () {}
@@ -54,24 +56,30 @@ export default {
     border-radius: 3px;
     background: #fff;
     height: 36px;
+    padding: 8px 12px 8px 35px;
     flex: 1;
-    display: flex;
-    align-items: center;
   }
   .icon-sousuo, .icon-cuowu {
     width: 18px;
     height: 18px;
     color: $color-pink;
-    margin: 0 9px;
+    position: absolute;
+    top: 9px;
+  }
+  .icon-sousuo {
+    left: 10px;
+  }
+  .icon-cuowu {
+    right: 10px;
   }
   .box {
-    flex: 1;
-    height: 20px;
     line-height: 20px;
     color:$color-text-gr;
     border: none;
     -webkit-appearance: none;
     font-size: $font-size-medium;
+    height: 20px;
+    width: 100%;
     &::placeholder {
       color: $color-text-gr;
     }
