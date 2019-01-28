@@ -23,7 +23,7 @@ export default {
   },
   watch: {
     query (val) {
-      this.$emit('input', val);
+      // this.$emit('input', val);
     },
     value (val) {
       this.query = val;

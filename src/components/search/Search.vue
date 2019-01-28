@@ -1,6 +1,7 @@
 <template>
   <div class="search">
     <search-box v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
+    <div>{{query}}</div>
     <div class="hot-key" v-show="showHot">
       <h1 class="title">热门搜索</h1>
       <ul>
