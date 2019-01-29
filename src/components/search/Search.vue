@@ -1,7 +1,6 @@
 <template>
   <div class="search">
     <search-box v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
-    <div>{{query}}</div>
     <div class="hot-key" v-show="showHot">
       <h1 class="title">热门搜索</h1>
       <ul>
@@ -10,15 +9,19 @@
         </li>
       </ul>
     </div>
+    <div class="result">
+      <search-result :query="query"></search-result>
+    </div>
   </div>
 </template>
 
 <script>
 import SearchBox from 'components/common/SearchBox';
+import SearchResult from 'components/search-result/SearchResult';
 import { getHotKey } from 'service/search';
 export default {
   components: {
-    SearchBox
+    SearchBox, SearchResult
   },
   data () {
     return {

@@ -2,7 +2,7 @@
   <div class="search-box">
     <div class="input-wrap">
       <i class="icon-sousuo"></i>
-      <input ref="query" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
+      <input ref="query" type="search" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
       <i @click="clear" v-show="query" class="icon-cuowu"></i>
     </div>
     <div v-show="showCancel" @click.stop="cancelSearch" class="cancel-btn">取消</div>
@@ -23,7 +23,7 @@ export default {
   },
   watch: {
     query (val) {
-      // this.$emit('input', val);
+      this.$emit('input', val);
     },
     value (val) {
       this.query = val;
@@ -35,9 +35,6 @@ export default {
     }
   },
   methods: {
-    blur () {
-      this.$refs.query.blur()
-    },
     clear () {
       this.query = ''
     },
@@ -85,12 +82,14 @@ export default {
     line-height: 20px;
     color:$color-text-gr;
     border: none;
-    -webkit-appearance: none;
     font-size: $font-size-medium;
     height: 20px;
     width: 100%;
     &::placeholder {
       color: $color-text-gr;
+    }
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
     }
   }
   .cancel-btn {

@@ -1,5 +1,7 @@
 import { jsonpRequest } from '@/utils/jsonpRequest'
 import { qqyBase } from './config'
+import { axiosRequest } from '@/utils/axiosRequest'
+const requestIns = axiosRequest();
 
 // may see Cross-Origin Read Blocking (CORB)
 export function getHotKey () {
@@ -16,19 +18,16 @@ export function getHotKey () {
   return jsonpRequest(url, reallyData, opts)
 }
 
-export function search (query, page, zhida, perpage) {
-  const url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
-  var opts = {
-    name: 'search',
-    param: 'jsonpCallback'
-  }
-  const reallyData = Object.assign({}, qqyBase, {
+export function searchResult (query, page, zhida, perpage) {
+  const url = '/api/search'
+  const data = Object.assign({}, qqyBase, {
     uin: 0,
     platform: 'h5',
     needNewCode: 1,
     w: query,
     zhidaqu: zhida ? 1 : 0,
     catZhida: 1,
+    format: 'json',
     t: 0,
     flag: 1,
     ie: 'utf-8',
@@ -41,5 +40,7 @@ export function search (query, page, zhida, perpage) {
     _: +new Date()
   })
 
-  return jsonpRequest(url, reallyData, opts)
+  return requestIns(url, {
+    params: data
+  })
 }
