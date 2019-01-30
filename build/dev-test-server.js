@@ -5,6 +5,7 @@ module.exports = function(app, server) {
   app.get('/api/getDiscList',getPlaylist);
   app.get('/api/lyric',getLyric);
   app.get('/api/getSongList',getSongList);
+  app.get('/api/search',getSearchResult)
 }
 
 function getPlaylist (req, res) {
@@ -54,3 +55,20 @@ function getSongList (req, res) {
     console.log(e)
   })
 }
+
+function getSearchResult (req, res) {
+  const url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+  axios.get(url, {
+    headers: {
+      referer: 'https://y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    // handle some error
+    console.log(e)
+  })
+}
+
+

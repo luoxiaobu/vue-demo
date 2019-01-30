@@ -2,7 +2,7 @@
   <div class="song-list">
     <ul>
       <li @click="selectItem(song, index)" class="item" v-for="(song, index) in displaySongs" :key ="song.id">
-        <div class="list-order">{{index + 1}}</div>
+        <div :class="['list-order',{'color-font':  index<=2}]" v-if="rank">{{index + 1}}</div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{song.displaySong}}</p>
@@ -18,6 +18,10 @@ export default {
     songs: {
       type: Array,
       default: () => []
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -49,6 +53,10 @@ export default {
     font-size: $font-size-medium;
     .list-order {
       width: 30px;
+    }
+    .color-font {
+      color: $color-pink;
+      font-size: $font-size-medium-x;
     }
     .content {
       flex: 1;
