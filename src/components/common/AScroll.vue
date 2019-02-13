@@ -8,7 +8,7 @@
 <script type="text/javascript">
 import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate } from '@/utils/animation';
-const HEAD_HEIGHT = '88px'
+import { HEAD_HEIGHT } from '@/data/consts.js'
 const transform = prefixStyle('transform')
 export default {
   props: {
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     positionTop () {
-      return this.top || HEAD_HEIGHT
+      return this.top || `${HEAD_HEIGHT}px`
     },
     transform () {
       let translateY = `${this.translate}px`
@@ -138,6 +138,8 @@ export default {
       })
     },
     checkBottomReached () {
+      console.log('this.$el.getBoundingClientRect().bottom', this.$el.getBoundingClientRect().bottom);
+      console.log('this.scrollEle.getBoundingClientRect().bottom', this.scrollEle.getBoundingClientRect().bottom);
       return parseInt(this.$el.getBoundingClientRect().bottom) <= parseInt(this.scrollEle.getBoundingClientRect().bottom) + 1;
     }
   },
@@ -153,7 +155,6 @@ export default {
   bottom: 0;
   overflow: hidden;
   .scroll {
-    height: 100%
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
   }

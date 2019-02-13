@@ -1,5 +1,5 @@
 <template>
-  <div class="search-result">
+  <a-scroll :top="scrollHeight" :pull-up="pullUp" class="search-result">
     <ul class="search-list" v-for="(list,index) in result" :key="index">
       <li class="search-item" v-for="item in list.song" :key="item.id">
         <div class="icon icon-music"></div>
@@ -7,10 +7,10 @@
         <p class="desc">{{item.singer}}</p>
       </li>
     </ul>
-  </div>
+  </a-scroll>
 </template>
 <script>
-// import AScroll from 'components/common/AScroll'
+import AScroll from 'components/common/AScroll'
 import { searchResult } from 'service/search';
 import { createSong } from 'components/singer-detail/song';
 export default {
@@ -26,7 +26,18 @@ export default {
     perpage: {
       type: Number,
       default: 20
+    },
+    scrollHeight: {
+      type: String,
+      default: ''
+    },
+    pullUp: {
+      type: Boolean,
+      default: false
     }
+  },
+  components: {
+    AScroll
   },
   data () {
     return {
@@ -50,7 +61,6 @@ export default {
     },
     searchResult (query, page, zhida, perpage) {
       searchResult(query, page, zhida, perpage).then((data) => {
-        console.log(data)
         var list = data.song.list.map((item) => {
           return createSong(item)
         })
@@ -59,7 +69,6 @@ export default {
           zhida: data.zhida
         }
         this.result.push(temp);
-        console.log(this.result)
       }).catch(() => {})
     }
   }

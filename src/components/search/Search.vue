@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <search-box v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
+    <search-box ref="searchBox" v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
     <div class="hot-key" v-show="showHot">
       <h1 class="title">热门搜索</h1>
       <ul>
@@ -9,7 +9,7 @@
         </li>
       </ul>
     </div>
-    <search-result :query="query"></search-result>
+    <search-result v-show="query" :pull-up="pullUp" :scroll-height="scrollHeight" :query="query"></search-result>
   </div>
 </template>
 
@@ -17,6 +17,7 @@
 import SearchBox from 'components/common/SearchBox';
 import SearchResult from 'components/search-result/SearchResult';
 import { getHotKey } from 'service/search';
+import { HEAD_HEIGHT } from '@/data/consts.js'
 export default {
   components: {
     SearchBox, SearchResult
@@ -25,7 +26,9 @@ export default {
     return {
       hotKey: [],
       showHot: true,
-      query: ''
+      query: '',
+      scrollHeight: '0px',
+      pullUp: true
     }
   },
   methods: {
@@ -40,10 +43,16 @@ export default {
     addQuery (query) {
       this.query = query
       this.showHotKey(false);
+    },
+    initView () {
+      this.scrollHeight = `${this.$refs.searchBox.$el.clientHeight + HEAD_HEIGHT}px`
     }
   },
   created () {
     this.getHotKey()
+  },
+  mounted () {
+    this.initView()
   }
 }
 </script>
@@ -70,10 +79,6 @@ export default {
     .color-pick {
       border: 1px solid $color-pink;
     }
-  }
-  .result {
-    position: relative;
-    height: 100%;
   }
 }
 </style>
