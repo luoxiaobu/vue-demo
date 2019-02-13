@@ -17,10 +17,10 @@
       </div>
     </transition>
     <div class="bg-image" :style="bgStyle" ref="bgImage"></div>
-    <div class="album" v-if="!listenPull">
+    <div class="album" v-if="!pullDown">
       <slot></slot>
     </div>
-    <a-scroll :top="scrollHeight" @pull="pull" :listen-pull="listenPull" @scroll="scroll" :listen-scroll="listenScroll">
+    <a-scroll :top="scrollHeight" @pull="pull" :pull-down="pullDown" @scroll="scroll" :listen-scroll="listenScroll">
       <div :style="layerStyle" ref="layer"></div>
       <song-list class="song-wrapper" :rank="rank" :songs="songs" @select="selectItem"></song-list>
     </a-scroll>
@@ -58,7 +58,7 @@ export default {
       type: String,
       default: ''
     },
-    listenPull: {
+    pullDown: {
       type: Boolean,
       default: true
     },

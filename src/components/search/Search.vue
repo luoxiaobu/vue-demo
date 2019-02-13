@@ -9,9 +9,7 @@
         </li>
       </ul>
     </div>
-    <div class="result">
-      <search-result :query="query"></search-result>
-    </div>
+    <search-result :query="query"></search-result>
   </div>
 </template>
 
@@ -72,6 +70,10 @@ export default {
     .color-pick {
       border: 1px solid $color-pink;
     }
+  }
+  .result {
+    position: relative;
+    height: 100%;
   }
 }
 </style>

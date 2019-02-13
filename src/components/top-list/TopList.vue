@@ -1,13 +1,13 @@
 <template>
   <transition name="slide">
     <div class="top-list">
-      <music-list :title="title" :rank="rank" :bg-image="bgImage" :songs="songList" :listen-pull="listenPull">
+      <music-list :title="title" :rank="rank" :bg-image="bgImage" :songs="songList" :pull-down="listenPull">
         <div class="banner">
           <div class="album-card flexbox">
             <img class="album-img" width="100%" :src="bgImage">
             <div class="album-bd">
-              <h1 class="album-name" >巅峰榜·流行指数</h1>
-              <p class="album-desc">第26天</p>
+              <h1 class="album-name">{{title}}</h1>
+              <p class="album-desc">第{{dataOfYear}}天</p>
               <p class="album-desc">{{updateTime}}更新</p>
             </div>
           </div>
@@ -29,7 +29,8 @@ export default {
       listenPull: false,
       topinfo: {},
       updateTime: '',
-      rank: true
+      rank: true,
+      dataOfYear: '- -'
     }
   },
   components: {
@@ -58,7 +59,8 @@ export default {
       }
       getMusicList(id).then((data) => {
         this.topinfo = data.topinfo;
-        this.updateTime = data.update_time
+        this.updateTime = data.update_time;
+        this.dataOfYear = data.day_of_year;
         var temp = data.songlist.map((item) => {
           return item.data;
         })
