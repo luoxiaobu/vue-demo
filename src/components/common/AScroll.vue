@@ -83,17 +83,16 @@ export default {
       this.bottomReached = false;
     },
     handleTouchMove (ev) {
-      if (this.startClientY < this.scrollEle.getBoundingClientRect().top && this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
+      if (this.startClientY < this.scrollEle.getBoundingClientRect().top || this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
         return;
       }
       this.currentClientY = ev.touches[0].clientY;
-      let distance = (this.currentClientY - this.startClientY) / this.distanceIndex;
+      let distance = (this.currentClientY - this.startClientY) / this.distanceIndex
       if (this.pullDown) {
         if (this.scrollEle.scrollTop === 0 && distance > 0) {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
-            ev.stopPropagation();
           }
           this.translate = distance - this.startScrollTop
         } else {
@@ -103,6 +102,7 @@ export default {
           this.translate = 0;
         }
         this.$emit('pull', this.translate);
+        return;
       }
       if (this.pullUp) {
         this.bottomReached = this.bottomReached || this.checkBottomReached();
@@ -110,7 +110,6 @@ export default {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
-            ev.stopPropagation();
           }
           this.translate = this.scrollEle.scrollTop - this.startScrollTop + distance;
         } else {
@@ -155,6 +154,7 @@ export default {
   bottom: 0;
   overflow: hidden;
   .scroll {
+    height: 100%
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
   }
