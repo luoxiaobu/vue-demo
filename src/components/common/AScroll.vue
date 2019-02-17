@@ -1,7 +1,9 @@
 <template>
   <div class="scroll-wrap" :style="{top:positionTop}">
     <div class="scroll" ref="scroll"  :style="transform">
-      <slot></slot>
+      <div ref="content">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +47,8 @@ export default {
       currentY: 0,
       translate: 0,
       scrollEle: null,
-      bottomReached: false
+      bottomReached: false,
+      content: null
     }
   },
   computed: {
@@ -63,6 +66,7 @@ export default {
     },
     init () {
       this.scrollEle = this.$refs.scroll;
+      this.content = this.$refs.content;
       if (this.listenScroll) {
         this.scrollEle.addEventListener('scroll', this.getScrollPosition)
       }
@@ -83,7 +87,7 @@ export default {
       this.bottomReached = false;
     },
     handleTouchMove (ev) {
-      if (this.startClientY < this.scrollEle.getBoundingClientRect().top || this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
+      if (this.startClientY < this.scrollEle.getBoundingClientRect().top && this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
         return;
       }
       this.currentClientY = ev.touches[0].clientY;
@@ -126,6 +130,7 @@ export default {
       if (this.pullDown) {
         this.$emit('pull', this.translate);
       } else if (this.pullUp) {
+        this.bottomReached = false;
         this.$emit('pullUp', this.translate);
       }
     },
@@ -137,9 +142,7 @@ export default {
       })
     },
     checkBottomReached () {
-      console.log('this.$el.getBoundingClientRect().bottom', this.$el.getBoundingClientRect().bottom);
-      console.log('this.scrollEle.getBoundingClientRect().bottom', this.scrollEle.getBoundingClientRect().bottom);
-      return parseInt(this.$el.getBoundingClientRect().bottom) <= parseInt(this.scrollEle.getBoundingClientRect().bottom) + 1;
+      return parseInt(this.$el.getBoundingClientRect().bottom) >= parseInt(this.content.getBoundingClientRect().bottom);
     }
   },
   mounted () {
