@@ -15,3 +15,5 @@ export const iconMode = {
   1: 'icon-loop',
   2: 'icon-random'
 }
+
+export const HEAD_HEIGHT = 88

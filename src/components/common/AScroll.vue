@@ -1,14 +1,16 @@
 <template>
   <div class="scroll-wrap" :style="{top:positionTop}">
     <div class="scroll" ref="scroll"  :style="transform">
-      <slot></slot>
+      <div ref="content">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
 <script type="text/javascript">
 import { prefixStyle } from '@/utils/tools.js';
 import { getTranslate } from '@/utils/animation';
-const HEAD_HEIGHT = '88px'
+import { HEAD_HEIGHT } from '@/data/consts.js'
 const transform = prefixStyle('transform')
 export default {
   props: {
@@ -45,12 +47,13 @@ export default {
       currentY: 0,
       translate: 0,
       scrollEle: null,
-      bottomReached: false
+      bottomReached: false,
+      content: null
     }
   },
   computed: {
     positionTop () {
-      return this.top || HEAD_HEIGHT
+      return this.top || `${HEAD_HEIGHT}px`
     },
     transform () {
       let translateY = `${this.translate}px`
@@ -63,6 +66,7 @@ export default {
     },
     init () {
       this.scrollEle = this.$refs.scroll;
+      this.content = this.$refs.content;
       if (this.listenScroll) {
         this.scrollEle.addEventListener('scroll', this.getScrollPosition)
       }
@@ -87,13 +91,12 @@ export default {
         return;
       }
       this.currentClientY = ev.touches[0].clientY;
-      let distance = (this.currentClientY - this.startClientY) / this.distanceIndex;
+      let distance = (this.currentClientY - this.startClientY) / this.distanceIndex
       if (this.pullDown) {
         if (this.scrollEle.scrollTop === 0 && distance > 0) {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
-            ev.stopPropagation();
           }
           this.translate = distance - this.startScrollTop
         } else {
@@ -103,6 +106,7 @@ export default {
           this.translate = 0;
         }
         this.$emit('pull', this.translate);
+        return;
       }
       if (this.pullUp) {
         this.bottomReached = this.bottomReached || this.checkBottomReached();
@@ -110,7 +114,6 @@ export default {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
-            ev.stopPropagation();
           }
           this.translate = this.scrollEle.scrollTop - this.startScrollTop + distance;
         } else {
@@ -127,6 +130,7 @@ export default {
       if (this.pullDown) {
         this.$emit('pull', this.translate);
       } else if (this.pullUp) {
+        this.bottomReached = false;
         this.$emit('pullUp', this.translate);
       }
     },
@@ -138,7 +142,7 @@ export default {
       })
     },
     checkBottomReached () {
-      return parseInt(this.$el.getBoundingClientRect().bottom) <= parseInt(this.scrollEle.getBoundingClientRect().bottom) + 1;
+      return parseInt(this.$el.getBoundingClientRect().bottom) >= parseInt(this.content.getBoundingClientRect().bottom);
     }
   },
   mounted () {
