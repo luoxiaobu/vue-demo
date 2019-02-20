@@ -4,9 +4,10 @@
       <div class="content" ref="content">
         <div :style="transform">
           <slot></slot>
-          <div class="loadmore-bottom" v-if="bottomMethod">
-            <span class="arrow" v-show="bottomStatus !== 'loading'" :class="{ 'is-rotate': bottomStatus === 'drop' }">↓</span>
-            <span v-show="bottomStatus === 'loading'">Loading...</span>
+          <div :class="['loadmore-bottom', {'no-more': bottomAllLoaded}]" v-if="bottomMethod">
+            <span class="arrow" v-show="!this.loading&&!bottomAllLoaded" :class="{ 'is-rotate': bottomStatus === 'drop' }">↓</span>
+            <span v-show="this.loading&&!bottomAllLoaded">Loading...</span>
+            <span class="no-more-text" v-show="!this.loading&&bottomAllLoaded">没有更多数据了~~</span>
           </div>
         </div>
       </div>
@@ -48,6 +49,10 @@ export default {
     bottomDistance: {
       type: Number,
       default: 60
+    },
+    bottomAllLoaded: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -69,6 +74,9 @@ export default {
     transform () {
       let translateY = `${this.translate}px`
       return this.translate === 0 ? null : `${transform}:${getTranslate(0, translateY)}`;
+    },
+    loading () {
+      return this.bottomStatus === 'loading'
     }
   },
   methods: {
@@ -96,7 +104,7 @@ export default {
       element.addEventListener('touchend', this.handleTouchEnd);
     },
     handleTouchStart (ev) {
-      if (this.bottomStatus === 'loading') {
+      if (this.loading) {
         return
       }
       this.startClientY = ev.touches[0].clientY;
@@ -105,7 +113,7 @@ export default {
       this.bottomReached = false;
     },
     handleTouchMove (ev) {
-      if (this.bottomStatus === 'loading') {
+      if (this.loading) {
         return
       }
       if (this.startClientY < this.scrollEle.getBoundingClientRect().top && this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
@@ -129,7 +137,7 @@ export default {
       }
       if (this.pullUp) {
         this.bottomReached = this.bottomReached || this.checkBottomReached();
-        if (this.bottomReached && distance < 0 && this.bottomStatus !== 'loading') {
+        if (this.bottomReached && distance < 0 && this.bottomStatus !== 'loading' && !this.bottomAllLoaded) {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
@@ -144,7 +152,7 @@ export default {
       }
     },
     handleTouchEnd () {
-      if (this.bottomStatus === 'loading') {
+      if (this.loading) {
         return
       }
       if (this.pullDown) {
@@ -172,6 +180,12 @@ export default {
         x: element.scrollLeft
       })
     },
+    onBottomLoaded () {
+      this.bottomStatus = 'pull';
+      this.$nextTick(() => {
+        this.translate = 0;
+      });
+    },
     checkBottomReached () {
       return parseInt(this.$el.getBoundingClientRect().bottom) >= parseInt(this.content.getBoundingClientRect().bottom);
     }
@@ -182,6 +196,7 @@ export default {
 }
 </script>
 <style lang="stylus">
+@import "../../themes/variable"
 .scroll-wrap {
   position: absolute;
   width: 100%;
@@ -208,6 +223,13 @@ export default {
     .is-rotate {
       transform: rotate(180deg);
     }
+  }
+  .no-more {
+    margin-bottom: 0;
+  }
+  .no-more-text {
+    font-size: $font-size-medium;
+    color: $color-pink;
   }
 }
 </style>

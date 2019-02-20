@@ -1,7 +1,7 @@
 <template>
-  <a-scroll :top="scrollHeight" :pull-up="pullUp" class="search-result">
-    <ul class="search-list" v-for="(list,index) in result" :key="index">
-      <li class="search-item" v-for="item in list.song" :key="item.id">
+  <a-scroll ref="result" :top="scrollHeight" :pull-up="pullUp" class="search-result" :bottom-all-loaded="!hasMore" :bottom-method="searchMore">
+    <ul class="search-list" v-for="(list, index) in result" :key="index">
+      <li class="search-item" v-for="item in list" :key="item.id">
         <div class="icon icon-music"></div>
         <h2 class="name">{{item.name}}</h2>
         <p class="desc">{{item.singer}}</p>
@@ -13,13 +13,17 @@
 import AScroll from 'components/common/AScroll'
 import { searchResult } from 'service/search';
 import { createSong } from 'components/singer-detail/song';
+
+const TYPE_SINGER = 'singer'
+const perpage = 20
+
 export default {
   props: {
     query: {
       type: String,
       default: ''
     },
-    zhida: {
+    showSinger: {
       type: Boolean,
       default: true
     },
@@ -42,15 +46,16 @@ export default {
   data () {
     return {
       result: [],
-      page: 1
+      page: 1,
+      hasMore: true,
+      loading: false
     }
   },
   watch: {
     query () {
-      this.initData();
       if (this.query) {
-        this.page = 1;
-        this.searchResult(this.query, this.page, this.zhida, this.perpage);
+        this.initData();
+        this.searchResult(this.query, this.page, this.showSinger, this.perpage);
       }
     }
   },
@@ -59,17 +64,46 @@ export default {
       this.result = [];
       this.page = 1;
     },
-    searchResult (query, page, zhida, perpage) {
-      searchResult(query, page, zhida, perpage).then((data) => {
-        var list = data.song.list.map((item) => {
+    dealResult (data) {
+      let ret = []
+      if (data.zhida && data.zhida.singerid) {
+        ret.push({...data.zhida, ...{type: TYPE_SINGER}})
+      }
+      if (data.song) {
+        ret = ret.concat(data.song.list.map((item) => {
           return createSong(item)
-        })
-        var temp = {
-          song: list,
-          zhida: data.zhida
-        }
-        this.result.push(temp);
-      }).catch(() => {})
+        }))
+      }
+      return ret
+    },
+    checkMore (data) {
+      const song = data.song
+      if (!song.list.length || (song.curnum + (song.curpage - 1) * perpage) >= song.totalnum) {
+        this.hasMore = false
+      }
+    },
+    searchResult (query, page, showSinger, perpage) {
+      if (this.loading) {
+        return
+      }
+      this.loading = true;
+      searchResult(query, page, showSinger, perpage).then((data) => {
+        this.result.splice(this.page, 0, this.dealResult(data));
+        this.checkMore(data);
+        this.$refs.result.onBottomLoaded();
+        this.loading = false;
+      }).catch(() => {
+        // error still not processe
+        this.$refs.result.onBottomLoaded();
+        this.loading = false;
+      })
+    },
+    searchMore () {
+      if (!this.hasMore || this.loading) {
+        return
+      }
+      this.page++
+      this.searchResult(this.query, this.page, this.showSinger, this.perpage);
     }
   }
 }
