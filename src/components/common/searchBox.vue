@@ -2,7 +2,7 @@
   <div class="search-box">
     <div class="input-wrap">
       <i class="icon-sousuo"></i>
-      <input ref="query" type="search" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
+      <input ref="query" type="search" @keyup.enter="submit" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
       <i @click="clear" v-show="query" class="icon-cuowu"></i>
     </div>
     <div v-show="showCancel" @click.stop="cancelSearch" class="cancel-btn">取消</div>
@@ -15,35 +15,41 @@ export default {
       type: String,
       default: '搜索歌曲、歌手'
     },
-    value: String,
-    showCancel: {
-      type: Boolean,
-      default: false
+    searchValue: {
+      type: String
     }
   },
   watch: {
-    query (val) {
-      this.$emit('input', val);
-    },
-    value (val) {
+    searchValue (val) {
       this.query = val;
+      this.showCancel = true;
     }
   },
   data () {
     return {
-      query: ''
+      query: '',
+      showCancel: false
     }
   },
   methods: {
     clear () {
       this.query = ''
+      this.focus();
     },
     focus () {
-      this.$emit('cancelSearch', false)
+      if (this.query) {
+        return
+      }
+      this.showCancel = true
+      this.$emit('searchFocus', false, this.query)
     },
     cancelSearch () {
       this.query = '';
+      this.showCancel = false;
       this.$emit('cancelSearch', true)
+    },
+    submit () {
+      this.$emit('submit', this.query)
     }
   },
   mounted () {}

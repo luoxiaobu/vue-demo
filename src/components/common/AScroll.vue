@@ -1,8 +1,15 @@
 <template>
   <div class="scroll-wrap" :style="{top:positionTop}">
-    <div class="scroll" ref="scroll"  :style="transform">
-      <div ref="content">
-        <slot></slot>
+    <div class="scroll" ref="scroll">
+      <div class="content" ref="content">
+        <div :style="transform">
+          <slot></slot>
+          <div :class="['loadmore-bottom', {'no-more': bottomAllLoaded}]" v-if="bottomMethod">
+            <span class="arrow" v-show="!this.loading&&!bottomAllLoaded" :class="{ 'is-rotate': bottomStatus === 'drop' }">↓</span>
+            <span v-show="this.loading&&!bottomAllLoaded">Loading...</span>
+            <span class="no-more-text" v-show="!this.loading&&bottomAllLoaded">没有更多数据了~~</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -38,6 +45,14 @@ export default {
     },
     bottomMethod: {
       type: Function
+    },
+    bottomDistance: {
+      type: Number,
+      default: 60
+    },
+    bottomAllLoaded: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -48,7 +63,8 @@ export default {
       translate: 0,
       scrollEle: null,
       bottomReached: false,
-      content: null
+      content: null,
+      bottomStatus: ''
     }
   },
   computed: {
@@ -58,6 +74,9 @@ export default {
     transform () {
       let translateY = `${this.translate}px`
       return this.translate === 0 ? null : `${transform}:${getTranslate(0, translateY)}`;
+    },
+    loading () {
+      return this.bottomStatus === 'loading'
     }
   },
   methods: {
@@ -67,11 +86,15 @@ export default {
     init () {
       this.scrollEle = this.$refs.scroll;
       this.content = this.$refs.content;
+      this.bottomStatus = 'pull';
       if (this.listenScroll) {
         this.scrollEle.addEventListener('scroll', this.getScrollPosition)
       }
       if (this.pullDown || this.pullUp) {
         this.bindTouchEvents(this.scrollEle)
+      }
+      if (this.bottomStatus !== 'loading') {
+        this.bottomStatus = 'pull';
       }
     },
     bindTouchEvents (element) {
@@ -81,12 +104,18 @@ export default {
       element.addEventListener('touchend', this.handleTouchEnd);
     },
     handleTouchStart (ev) {
+      if (this.loading) {
+        return
+      }
       this.startClientY = ev.touches[0].clientY;
       // touchStart 开始时候 scrollTop 的值
       this.startScrollTop = this.scrollEle.scrollTop;
       this.bottomReached = false;
     },
     handleTouchMove (ev) {
+      if (this.loading) {
+        return
+      }
       if (this.startClientY < this.scrollEle.getBoundingClientRect().top && this.startClientY > this.scrollEle.getBoundingClientRect().bottom) {
         return;
       }
@@ -99,38 +128,48 @@ export default {
             ev.preventDefault();
           }
           this.translate = distance - this.startScrollTop
-        } else {
-          this.translate = 0;
+          if (this.translate < 0) {
+            this.translate = 0;
+          }
+          this.$emit('pull', this.translate);
+          return;
         }
-        if (this.translate < 0) {
-          this.translate = 0;
-        }
-        this.$emit('pull', this.translate);
-        return;
       }
       if (this.pullUp) {
         this.bottomReached = this.bottomReached || this.checkBottomReached();
-        if (this.bottomReached && distance < 0) {
+        if (this.bottomReached && distance < 0 && this.bottomStatus !== 'loading' && !this.bottomAllLoaded) {
           // if trigger TouchMove not touch Scroll
           if (ev.cancelable) {
             ev.preventDefault();
           }
           this.translate = this.scrollEle.scrollTop - this.startScrollTop + distance;
-        } else {
-          this.translate = 0;
+          if (this.translate > 0) {
+            this.translate = 0;
+          }
+          this.$emit('pullUp', this.translate);
+          this.bottomStatus = -this.translate >= this.bottomDistance ? 'drop' : 'pull';
         }
-        if (this.translate > 0) {
-          this.translate = 0;
-        }
-        this.$emit('pullUp', this.translate);
       }
     },
     handleTouchEnd () {
-      this.translate = '0';
+      if (this.loading) {
+        return
+      }
       if (this.pullDown) {
+        this.translate = '0';
         this.$emit('pull', this.translate);
       } else if (this.pullUp) {
-        this.bottomReached = false;
+        if (this.bottomReached && this.translate < 0) {
+          this.bottomReached = false;
+          if (this.bottomStatus === 'drop') {
+            this.translate = '-50';
+            this.bottomStatus = 'loading';
+            this.bottomMethod && this.bottomMethod();
+          } else {
+            this.translate = '0';
+            this.bottomStatus = 'pull';
+          }
+        }
         this.$emit('pullUp', this.translate);
       }
     },
@@ -140,6 +179,12 @@ export default {
         y: element.scrollTop,
         x: element.scrollLeft
       })
+    },
+    onBottomLoaded () {
+      this.bottomStatus = 'pull';
+      this.$nextTick(() => {
+        this.translate = 0;
+      });
     },
     checkBottomReached () {
       return parseInt(this.$el.getBoundingClientRect().bottom) >= parseInt(this.content.getBoundingClientRect().bottom);
@@ -151,6 +196,7 @@ export default {
 }
 </script>
 <style lang="stylus">
+@import "../../themes/variable"
 .scroll-wrap {
   position: absolute;
   width: 100%;
@@ -160,6 +206,30 @@ export default {
     height: 100%
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+  }
+  .content {
+    overflow: hidden;
+  }
+  .loadmore-bottom {
+    margin-bottom: -50px;
+    text-align: center;
+    height: 50px;
+    line-height: 50px;
+    .arrow {
+      vertical-align: middle;
+      display: inline-block;
+      transition: .2s linear;
+    }
+    .is-rotate {
+      transform: rotate(180deg);
+    }
+  }
+  .no-more {
+    margin-bottom: 0;
+  }
+  .no-more-text {
+    font-size: $font-size-medium;
+    color: $color-pink;
   }
 }
 </style>
