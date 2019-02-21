@@ -1,6 +1,9 @@
 <template>
   <div class="search">
-    <search-box ref="searchBox" v-model="query" :show-cancel="!showHot" @cancelSearch="showHotKey"></search-box>
+    <search-box ref="searchBox" :search-value="query"
+    @submit="submit"
+    @cancelSearch="cancelSearch"
+    @searchFocus="searchFocus"></search-box>
     <div class="hot-key" v-show="showHot">
       <h1 class="title">热门搜索</h1>
       <ul>
@@ -37,12 +40,20 @@ export default {
         this.hotKey = data.hotkey.slice(0, 10)
       }).catch(() => {})
     },
-    showHotKey (value) {
-      this.showHot = value;
+    cancelSearch (value) {
+      this.showHot = true;
+      this.query = '';
+    },
+    searchFocus (showHot, query) {
+      this.showHot = false;
+      this.query = query
+    },
+    submit (value) {
+      this.query = value;
     },
     addQuery (query) {
-      this.query = query
-      this.showHotKey(false);
+      this.query = query;
+      this.showHot = false;
     },
     initView () {
       this.scrollHeight = `${this.$refs.searchBox.$el.clientHeight + HEAD_HEIGHT}px`

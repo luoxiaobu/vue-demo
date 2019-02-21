@@ -2,9 +2,16 @@
   <a-scroll ref="result" :top="scrollHeight" :pull-up="pullUp" class="search-result" :bottom-all-loaded="!hasMore" :bottom-method="searchMore">
     <ul class="search-list" v-for="(list, index) in result" :key="index">
       <li class="search-item" v-for="item in list" :key="item.id">
-        <div class="icon icon-music"></div>
-        <h2 class="name">{{item.name}}</h2>
-        <p class="desc">{{item.singer}}</p>
+        <template v-if="item.type===TYPE_SINGER">
+          <img class="icon-mine" :src="getImg(item.singermid)">
+          <h2 class="name">{{item.singername}}</h2>
+          <p class="desc"><span>单曲：{{item.songnum}}</span><span>专辑：{{item.albumnum}}</span></p>
+        </template>
+        <template v-else>
+          <div class="icon icon-music"></div>
+          <h2 class="name">{{item.name}}</h2>
+          <p class="desc">{{item.singer}}</p>
+        </template>
       </li>
     </ul>
   </a-scroll>
@@ -48,7 +55,8 @@ export default {
       result: [],
       page: 1,
       hasMore: true,
-      loading: false
+      loading: false,
+      TYPE_SINGER
     }
   },
   watch: {
@@ -63,6 +71,9 @@ export default {
     initData () {
       this.result = [];
       this.page = 1;
+    },
+    getImg (singermid) {
+      return `https://y.gtimg.cn/music/photo_new/T001R68x68M000${singermid}.jpg?max_age=2592000`
     },
     dealResult (data) {
       let ret = []
@@ -137,6 +148,14 @@ export default {
       left: 18px;
       color: $color-pink;
       font-size: $font-size-large-x;
+    }
+    .icon-mine {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
     }
     .name {
       no-wrap()
