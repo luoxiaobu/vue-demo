@@ -53,7 +53,7 @@ export default {
   data () {
     return {
       result: [],
-      page: 1,
+      page: 0,
       hasMore: true,
       loading: false,
       TYPE_SINGER
@@ -63,14 +63,14 @@ export default {
     query () {
       if (this.query) {
         this.initData();
-        this.searchResult(this.query, this.page, this.showSinger, this.perpage);
+        this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
       }
     }
   },
   methods: {
     initData () {
       this.result = [];
-      this.page = 1;
+      this.page = 0;
     },
     getImg (singermid) {
       return `https://y.gtimg.cn/music/photo_new/T001R68x68M000${singermid}.jpg?max_age=2592000`
@@ -99,6 +99,7 @@ export default {
       }
       this.loading = true;
       searchResult(query, page, showSinger, perpage).then((data) => {
+        this.page++
         this.result.splice(this.page, 0, this.dealResult(data));
         this.checkMore(data);
         this.$refs.result.onBottomLoaded();
@@ -113,8 +114,7 @@ export default {
       if (!this.hasMore || this.loading) {
         return
       }
-      this.page++
-      this.searchResult(this.query, this.page, this.showSinger, this.perpage);
+      this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
     }
   }
 }
