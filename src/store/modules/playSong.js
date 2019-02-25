@@ -80,6 +80,8 @@ const actions = {
         playlist.splice(fpIndex, 1)
         currentIndex++
       }
+    } else {
+      currentIndex++
     }
     playlist.splice(currentIndex, 0, song)
 
