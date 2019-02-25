@@ -1,7 +1,7 @@
 <template>
   <a-scroll ref="result" :top="scrollHeight" :pull-up="pullUp" class="search-result" :bottom-all-loaded="!hasMore" :bottom-method="searchMore">
     <ul class="search-list" v-for="(list, index) in result" :key="index">
-      <li class="search-item" v-for="item in list" :key="item.id">
+      <li class="search-item" v-for="item in list" :key="item.id" @click="selectItem(item)">
         <template v-if="item.type===TYPE_SINGER">
           <img class="icon-mine" :src="getImg(item.singermid)">
           <h2 class="name">{{item.singername}}</h2>
@@ -19,7 +19,10 @@
 <script>
 import AScroll from 'components/common/AScroll'
 import { searchResult } from 'service/search';
+import { getplaysongvkey } from 'service/song';
 import { createSong } from 'components/singer-detail/song';
+import Singer from 'components/singer/singerData.js';
+import { mapMutations, mapActions } from 'vuex';
 
 const TYPE_SINGER = 'singer'
 const perpage = 20
@@ -68,6 +71,12 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ]),
     initData () {
       this.result = [];
       this.page = 0;
@@ -86,6 +95,30 @@ export default {
         }))
       }
       return ret
+    },
+    selectItem (item) {
+      if (item.type === TYPE_SINGER) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.$router.push({
+          path: `/search/${singer.id}`
+        })
+        this.setSinger(singer)
+      } else {
+        if (item.url) {
+          this.insertSong(item);
+          return;
+        }
+        getplaysongvkey([item.mid]).then((data) => {
+          let tempData = data.data;
+          let midurlinfo = (tempData && tempData.midurlinfo && tempData.midurlinfo[0]) || {};
+          let doma = (tempData && tempData.sip && tempData.sip[0]) || '';
+          item.url = midurlinfo.purl ? doma + midurlinfo.purl : '';
+          this.insertSong(item)
+        }).catch(() => {})
+      }
     },
     checkMore (data) {
       const song = data.song

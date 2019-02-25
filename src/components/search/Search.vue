@@ -13,6 +13,7 @@
       </ul>
     </div>
     <search-result v-show="query" :pull-up="pullUp" :scroll-height="scrollHeight" :query="query"></search-result>
+    <router-view></router-view>
   </div>
 </template>
 
