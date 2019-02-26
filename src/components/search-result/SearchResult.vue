@@ -80,6 +80,8 @@ export default {
     initData () {
       this.result = [];
       this.page = 0;
+      this.hasMore = true;
+      this.loading = false;
     },
     getImg (singermid) {
       return `https://y.gtimg.cn/music/photo_new/T001R68x68M000${singermid}.jpg?max_age=2592000`

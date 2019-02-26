@@ -71,13 +71,13 @@ const actions = {
     let playlist = state.playlist.slice();
     let sequenceList = state.sequenceList.slice();
     let currentIndex = state.currentIndex;
-    let fpIndex = findIndex(playlist, song);
+    let findPlayIndex = findIndex(playlist, song);
     let length = sequenceList.length;
-    if (fpIndex > -1) {
-      if (currentIndex > fpIndex) {
-        playlist.splice(fpIndex, 1)
+    if (findPlayIndex > -1) {
+      if (currentIndex >= findPlayIndex) {
+        playlist.splice(findPlayIndex, 1)
       } else {
-        playlist.splice(fpIndex, 1)
+        playlist.splice(findPlayIndex, 1)
         currentIndex++
       }
     } else {
@@ -90,9 +90,6 @@ const actions = {
     }
     commit(types.SET_SEQUENCE_LIST, sequenceList);
     commit(types.SET_PLAYLIST, playlist);
-    if (currentIndex === -1) {
-      currentIndex = 0;
-    }
     commit(types.SET_CURRENT_INDEX, currentIndex)
     commit(types.SET_PLAYING, true);
     commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
