@@ -12,6 +12,7 @@
         </li>
       </ul>
     </div>
+    <search-record></search-record>
     <search-result v-show="query" :pull-up="pullUp" :scroll-height="scrollHeight" :query="query"></search-result>
     <router-view></router-view>
   </div>
@@ -19,13 +20,14 @@
 
 <script>
 import SearchBox from 'components/common/SearchBox';
+import SearchRecord from 'components/common/SearchRecord';
 import SearchResult from 'components/search-result/SearchResult';
 import { getHotKey } from 'service/search';
 import { HEAD_HEIGHT } from '@/data/consts.js'
 import { mapActions } from 'vuex';
 export default {
   components: {
-    SearchBox, SearchResult
+    SearchBox, SearchResult, SearchRecord
   },
   data () {
     return {
