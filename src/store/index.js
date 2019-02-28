@@ -5,6 +5,7 @@ import singer from './modules/singer'
 import playSong from './modules/playSong'
 import recommend from './modules/recommend'
 import rank from './modules/rank'
+import searchRecord from './modules/searchRecord'
 
 Vue.use(Vuex);
 const debug = process.env.NODE_ENV !== 'production'
@@ -14,7 +15,8 @@ export default new Vuex.Store({
     singer,
     playSong,
     recommend,
-    rank
+    rank,
+    searchRecord
   },
   plugins: debug ? [createLogger()] : [],
   strict: debug

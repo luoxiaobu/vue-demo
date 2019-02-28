@@ -22,6 +22,7 @@ import SearchBox from 'components/common/SearchBox';
 import SearchResult from 'components/search-result/SearchResult';
 import { getHotKey } from 'service/search';
 import { HEAD_HEIGHT } from '@/data/consts.js'
+import { mapActions } from 'vuex';
 export default {
   components: {
     SearchBox, SearchResult
@@ -36,6 +37,12 @@ export default {
     }
   },
   methods: {
+    ...mapActions([
+      'saveSearchHistory'
+    ]),
+    saveSearch () {
+      this.saveSearchHistory(this.query)
+    },
     getHotKey () {
       getHotKey().then((data) => {
         this.hotKey = data.hotkey.slice(0, 10)
@@ -51,10 +58,12 @@ export default {
     },
     submit (value) {
       this.query = value;
+      this.saveSearch();
     },
     addQuery (query) {
       this.query = query;
       this.showHot = false;
+      this.saveSearch()
     },
     initView () {
       this.scrollHeight = `${this.$refs.searchBox.$el.clientHeight + HEAD_HEIGHT}px`
