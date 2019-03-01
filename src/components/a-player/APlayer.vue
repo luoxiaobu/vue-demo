@@ -390,6 +390,10 @@ export default {
       if (!this.songReady) {
         return
       }
+      if (this.playlist.length === 1) {
+        this.loop()
+        return
+      }
       var index = this.prev(this.playlist.length, this.currentIndex);
       this.setCurrentIndex(index);
       if (!this.playing) {
@@ -399,6 +403,10 @@ export default {
     },
     nextSong () {
       if (!this.songReady) {
+        return
+      }
+      if (this.playlist.length === 1) {
+        this.loop()
         return
       }
       var index = this.next(this.playlist.length, this.currentIndex);

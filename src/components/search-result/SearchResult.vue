@@ -1,7 +1,7 @@
 <template>
   <a-scroll ref="result" :top="scrollHeight" :pull-up="pullUp" class="search-result" :bottom-all-loaded="!hasMore" :bottom-method="searchMore">
     <ul class="search-list" v-for="(list, index) in result" :key="index">
-      <li class="search-item" v-for="item in list" :key="item.id">
+      <li class="search-item" v-for="item in list" :key="item.id" @click="selectItem(item)">
         <template v-if="item.type===TYPE_SINGER">
           <img class="icon-mine" :src="getImg(item.singermid)">
           <h2 class="name">{{item.singername}}</h2>
@@ -19,7 +19,10 @@
 <script>
 import AScroll from 'components/common/AScroll'
 import { searchResult } from 'service/search';
+import { getplaysongvkey } from 'service/song';
 import { createSong } from 'components/singer-detail/song';
+import Singer from 'components/singer/singerData.js';
+import { mapMutations, mapActions } from 'vuex';
 
 const TYPE_SINGER = 'singer'
 const perpage = 20
@@ -53,7 +56,7 @@ export default {
   data () {
     return {
       result: [],
-      page: 1,
+      page: 0,
       hasMore: true,
       loading: false,
       TYPE_SINGER
@@ -63,14 +66,22 @@ export default {
     query () {
       if (this.query) {
         this.initData();
-        this.searchResult(this.query, this.page, this.showSinger, this.perpage);
+        this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
       }
     }
   },
   methods: {
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ]),
     initData () {
       this.result = [];
-      this.page = 1;
+      this.page = 0;
+      this.hasMore = true;
+      this.loading = false;
     },
     getImg (singermid) {
       return `https://y.gtimg.cn/music/photo_new/T001R68x68M000${singermid}.jpg?max_age=2592000`
@@ -87,6 +98,30 @@ export default {
       }
       return ret
     },
+    selectItem (item) {
+      if (item.type === TYPE_SINGER) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.$router.push({
+          path: `/search/${singer.id}`
+        })
+        this.setSinger(singer)
+      } else {
+        if (item.url) {
+          this.insertSong(item);
+          return;
+        }
+        getplaysongvkey([item.mid]).then((data) => {
+          let tempData = data.data;
+          let midurlinfo = (tempData && tempData.midurlinfo && tempData.midurlinfo[0]) || {};
+          let doma = (tempData && tempData.sip && tempData.sip[0]) || '';
+          item.url = midurlinfo.purl ? doma + midurlinfo.purl : '';
+          this.insertSong(item)
+        }).catch(() => {})
+      }
+    },
     checkMore (data) {
       const song = data.song
       if (!song.list.length || (song.curnum + (song.curpage - 1) * perpage) >= song.totalnum) {
@@ -99,6 +134,7 @@ export default {
       }
       this.loading = true;
       searchResult(query, page, showSinger, perpage).then((data) => {
+        this.page++
         this.result.splice(this.page, 0, this.dealResult(data));
         this.checkMore(data);
         this.$refs.result.onBottomLoaded();
@@ -113,8 +149,7 @@ export default {
       if (!this.hasMore || this.loading) {
         return
       }
-      this.page++
-      this.searchResult(this.query, this.page, this.showSinger, this.perpage);
+      this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
     }
   }
 }

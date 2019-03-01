@@ -19,3 +19,6 @@ export const SET_RECOMMEND = 'SET_RECOMMEND'
 
 // rank
 export const SET_TOP_LIST = 'SET_TOP_LIST'
+
+// search record
+export const SET_SEARCH_RECORD = 'SET_SEARCH_RECORD'

@@ -12,7 +12,7 @@ const state = {
 }
 
 const getters = {
-  playing: state => state.playing,
+  playing: state => state.playing, // playlist 播放列表
   playlist: state => state.playlist,
   sequenceList: state => state.sequenceList,
   playMode: state => state.playMode,
@@ -66,6 +66,33 @@ const actions = {
     commit(types.SET_CURRENT_INDEX, 0);
     commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
     commit(types.SET_PLAYING, true)
+  },
+  insertSong: ({commit, state}, song) => {
+    let playlist = state.playlist.slice();
+    let sequenceList = state.sequenceList.slice();
+    let currentIndex = state.currentIndex;
+    let findPlayIndex = findIndex(playlist, song);
+    let length = sequenceList.length;
+    if (findPlayIndex > -1) {
+      if (currentIndex >= findPlayIndex) {
+        playlist.splice(findPlayIndex, 1)
+      } else {
+        playlist.splice(findPlayIndex, 1)
+        currentIndex++
+      }
+    } else {
+      currentIndex++
+    }
+    playlist.splice(currentIndex, 0, song)
+
+    if (findIndex(sequenceList, song) <= -1) {
+      sequenceList.splice(Math.floor(Math.random() * length), 0, song)
+    }
+    commit(types.SET_SEQUENCE_LIST, sequenceList);
+    commit(types.SET_PLAYLIST, playlist);
+    commit(types.SET_CURRENT_INDEX, currentIndex)
+    commit(types.SET_PLAYING, true);
+    commit(types.SET_SHOW_MODE, SHOW_MODE.NORMAL);
   }
 }
 

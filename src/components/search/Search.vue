@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <search-box ref="searchBox" :search-value="query"
+    <search-box ref="searchBox" v-model="query"
     @submit="submit"
     @cancelSearch="cancelSearch"
     @searchFocus="searchFocus"></search-box>
@@ -12,18 +12,27 @@
         </li>
       </ul>
     </div>
-    <search-result v-show="query" :pull-up="pullUp" :scroll-height="scrollHeight" :query="query"></search-result>
+    <div v-show="showHistory">
+      <search-record :searches="getRecord" @delete="deleteSearchHistory" @select="addQuery"></search-record>
+      <p class="record-handle" @click.stop="clearSearchHistory">
+        <a href="javascript:;">清除搜索记录</a>
+      </p>
+    </div>
+    <search-result v-show="query && searchKey" :pull-up="pullUp" :scroll-height="scrollHeight" :query="searchKey"></search-result>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import SearchBox from 'components/common/SearchBox';
+import SearchRecord from 'components/common/SearchRecord';
 import SearchResult from 'components/search-result/SearchResult';
 import { getHotKey } from 'service/search';
 import { HEAD_HEIGHT } from '@/data/consts.js'
+import { mapActions, mapGetters } from 'vuex';
 export default {
   components: {
-    SearchBox, SearchResult
+    SearchBox, SearchResult, SearchRecord
   },
   data () {
     return {
@@ -31,10 +40,34 @@ export default {
       showHot: true,
       query: '',
       scrollHeight: '0px',
-      pullUp: true
+      pullUp: true,
+      historyFlag: false,
+      searchKey: ''
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'getRecord'
+    ]),
+    showHistory () {
+      return this.getRecord.length && this.historyFlag
     }
   },
   methods: {
+    ...mapActions([
+      'saveRecord',
+      'deleteRecord',
+      'clearRecord'
+    ]),
+    saveSearch () {
+      this.saveRecord(this.query)
+    },
+    deleteSearchHistory (item) {
+      this.deleteRecord(item)
+    },
+    clearSearchHistory () {
+      this.clearRecord()
+    },
     getHotKey () {
       getHotKey().then((data) => {
         this.hotKey = data.hotkey.slice(0, 10)
@@ -42,18 +75,24 @@ export default {
     },
     cancelSearch (value) {
       this.showHot = true;
-      this.query = '';
+      this.historyFlag = false;
     },
-    searchFocus (showHot, query) {
+    searchFocus (value) {
       this.showHot = false;
-      this.query = query
+      this.historyFlag = true;
     },
-    submit (value) {
-      this.query = value;
+    submit () {
+      this.searchKey = this.query;
+      this.historyFlag = false;
+      this.showHot = false;
+      this.saveSearch();
     },
     addQuery (query) {
+      this.searchKey = query;
       this.query = query;
       this.showHot = false;
+      this.historyFlag = false;
+      this.saveSearch()
     },
     initView () {
       this.scrollHeight = `${this.$refs.searchBox.$el.clientHeight + HEAD_HEIGHT}px`
@@ -89,6 +128,17 @@ export default {
     }
     .color-pick {
       border: 1px solid $color-pink;
+    }
+  }
+  .record-handle {
+    text-align: center;
+    height: 44px;
+    line-height: 44px;
+    a  {
+      font-size: $font-size-small;
+      display: inline-block;
+      line-height: 44px;
+      color: $color-pink;
     }
   }
 }
