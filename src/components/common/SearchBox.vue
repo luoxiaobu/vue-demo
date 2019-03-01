@@ -3,9 +3,9 @@
     <div class="input-wrap">
       <i class="icon-sousuo"></i>
       <input ref="query" type="search" @keyup.enter="submit" v-model="query" class="box" @focus="focus" :placeholder="placeholder">
-      <i @click="clear" v-show="query" class="icon-cuowu"></i>
+      <i @click="clear" v-show="value" class="icon-cuowu"></i>
     </div>
-    <div v-show="showCancel" @click.stop="cancelSearch" class="cancel-btn">取消</div>
+    <div v-show="showCancel || value" @click.stop="cancelSearch" class="cancel-btn">取消</div>
   </div>
 </template>
 <script>
@@ -15,38 +15,41 @@ export default {
       type: String,
       default: '搜索歌曲、歌手'
     },
-    searchValue: {
+    value: {
       type: String
-    }
-  },
-  watch: {
-    searchValue (val) {
-      this.query = val;
-      this.showCancel = true;
     }
   },
   data () {
     return {
-      query: '',
-      showCancel: false
+      showCancel: false,
+      query: this.value
+    }
+  },
+  watch: {
+    value (val) {
+      this.query = val;
+      this.showCancel = true;
+    },
+    query (val) {
+      this.$emit('input', val);
     }
   },
   methods: {
     clear () {
       this.query = ''
-      this.focus();
+      this.$refs.query.focus()
     },
     focus () {
       if (this.query) {
         return
       }
       this.showCancel = true
-      this.$emit('searchFocus', false, this.query)
+      this.$emit('searchFocus', this.query)
     },
     cancelSearch () {
       this.query = '';
       this.showCancel = false;
-      this.$emit('cancelSearch', true)
+      this.$emit('cancelSearch', this.query)
     },
     submit () {
       this.$emit('submit', this.query)
@@ -101,6 +104,7 @@ export default {
   .cancel-btn {
     padding: 0 10px;
     font-size: $font-size-medium;
+    display: block;
   }
 }
 </style>

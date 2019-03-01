@@ -1,21 +1,32 @@
 <template>
   <div class="search-record">
-    <ul>
-      <li class="item">
+    <transition-group name="list" tag="ul">
+      <li class="item" :key="item" v-for="item in searches">
         <a href="javascript:;" class="record-main">
-          <span class="icon iocn-clock"></span>
-          <span class="record-text">我曾把完整的镜子打碎</span>
-          <span class="icon-close"></span>
+          <span class="icon icon-shijian"></span>
+          <span class="record-text" @click="selectItem(item)">{{item}}</span>
+          <span class="icon-fork" @click.stop="deleteOne(item)"></span>
         </a>
       </li>
-    </ul>
-    <p class="record-handle">
-      <a href="javascript:;">清除搜索记录</a>
-    </p>
+    </transition-group>
   </div>
 </template>
 <script type="text/javascript">
 export default {
+  props: {
+    searches: {
+      type: Array,
+      default: () => []
+    }
+  },
+  methods: {
+    selectItem (item) {
+      this.$emit('select', item)
+    },
+    deleteOne (item) {
+      this.$emit('delete', item)
+    }
+  }
 }
 </script>
 <style lang="stylus">
@@ -32,9 +43,9 @@ export default {
     position: relative;
     height: 44px;
   }
-  .iocn-clock {
-    width: 20px;
-    height: 20px;
+  .icon-shijian {
+    font-size: $font-size-large-m;
+    color: $color-pink;
   }
   .record-text {
     margin: 0 20px;
@@ -45,19 +56,9 @@ export default {
     line-height: 44px;
     no-wrap()
   }
-  .icon-close {
-    width: 20px;
-    height: 20px;
-  }
-  .record-handle {
-    text-align: center;
-    height: 44px;
-    line-height: 44px;
-    a  {
-      display: inline-block;
-      line-height: 44px;
-      color: $color-pink;
-    }
+  .icon-fork {
+    font-size: $font-size-large-m;
+    color: $color-pink;
   }
 }
 </style>
