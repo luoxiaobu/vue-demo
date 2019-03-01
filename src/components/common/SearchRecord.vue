@@ -1,7 +1,7 @@
 <template>
   <div class="search-record">
     <transition-group name="list" tag="ul">
-      <li class="item" :key="item" v-for="item in searches">
+      <li :key="item" class="item" v-for="item in searches">
         <a href="javascript:;" class="record-main">
           <span class="icon icon-shijian"></span>
           <span class="record-text" @click="selectItem(item)">{{item}}</span>
@@ -59,6 +59,13 @@ export default {
   .icon-fork {
     font-size: $font-size-large-m;
     color: $color-pink;
+  }
+  .list-enter-active, .list-leave-active {
+    transition: all 0.3s
+  }
+  .list-enter, .list-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
   }
 }
 </style>

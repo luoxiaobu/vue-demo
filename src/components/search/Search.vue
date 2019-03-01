@@ -13,8 +13,8 @@
       </ul>
     </div>
     <div v-show="showHistory">
-      <search-record :searches="getSearchRecord"></search-record>
-      <p class="record-handle">
+      <search-record :searches="getRecord" @delete="deleteSearchHistory" @select="addQuery"></search-record>
+      <p class="record-handle" @click.stop="clearSearchHistory">
         <a href="javascript:;">清除搜索记录</a>
       </p>
     </div>
@@ -47,18 +47,26 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getSearchRecord'
+      'getRecord'
     ]),
     showHistory () {
-      return this.getSearchRecord.length && this.historyFlag
+      return this.getRecord.length && this.historyFlag
     }
   },
   methods: {
     ...mapActions([
-      'saveSearchHistory'
+      'saveRecord',
+      'deleteRecord',
+      'clearRecord'
     ]),
     saveSearch () {
-      this.saveSearchHistory(this.searchKey)
+      this.saveRecord(this.query)
+    },
+    deleteSearchHistory (item) {
+      this.deleteRecord(item)
+    },
+    clearSearchHistory () {
+      this.clearRecord()
     },
     getHotKey () {
       getHotKey().then((data) => {

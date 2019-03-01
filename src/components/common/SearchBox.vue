@@ -71,7 +71,7 @@ export default {
     border-radius: 3px;
     background: #fff;
     height: 36px;
-    padding: 8px 12px 8px 35px;
+    padding: 0 12px 0 35px;
     flex: 1;
   }
   .icon-sousuo, .icon-cuowu {
@@ -88,11 +88,11 @@ export default {
     right: 10px;
   }
   .box {
-    line-height: 20px;
+    line-height: 36px;
     color:$color-text-gr;
     border: none;
     font-size: $font-size-medium;
-    height: 20px;
+    height: 36px;
     width: 100%;
     &::placeholder {
       color: $color-text-gr;

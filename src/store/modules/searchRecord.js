@@ -2,13 +2,13 @@ import {
   SET_SEARCH_RECORD
 } from '../mutation-types'
 
-import {saveSearch} from '@/utils/cache.js'
+import {loadSearch, saveSearch, deleteSearch, clearSearch} from '@/utils/cache.js'
 const state = {
-  searchRecord: []
+  searchRecord: loadSearch()
 }
 
 const getters = {
-  getSearchRecord: state => state.searchRecord
+  getRecord: state => state.searchRecord
 }
 
 const mutations = {
@@ -18,8 +18,14 @@ const mutations = {
 }
 
 const actions = {
-  saveSearchHistory: ({commit}, query) => {
+  saveRecord: ({commit}, query) => {
     commit(SET_SEARCH_RECORD, saveSearch(query))
+  },
+  deleteRecord: ({commit}, query) => {
+    commit(SET_SEARCH_RECORD, deleteSearch(query))
+  },
+  clearRecord: ({commit}, query) => {
+    commit(SET_SEARCH_RECORD, clearSearch())
   }
 }
 
