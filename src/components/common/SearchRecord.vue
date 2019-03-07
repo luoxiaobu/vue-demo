@@ -33,6 +33,9 @@ export default {
 @import "../../themes/variable"
 @import "../../themes/mixin"
 .search-record {
+  li:last-child {
+    border-bottom: 1px solid #ededed;
+  }
   .item {
     border-top: 1px solid #ededed;
     padding: 0 15px;

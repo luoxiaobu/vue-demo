@@ -4,10 +4,9 @@
       <div class="content" ref="content">
         <div :style="transform">
           <slot></slot>
-          <div :class="['loadmore-bottom', {'no-more': bottomAllLoaded}]" v-if="bottomMethod">
+          <div class="loadmore-bottom" v-if="bottomMethod">
             <span class="arrow" v-show="!this.loading&&!bottomAllLoaded" :class="{ 'is-rotate': bottomStatus === 'drop' }">↓</span>
             <span v-show="this.loading&&!bottomAllLoaded">Loading...</span>
-            <span class="no-more-text" v-show="!this.loading&&bottomAllLoaded">没有更多数据了~~</span>
           </div>
         </div>
       </div>
@@ -223,13 +222,6 @@ export default {
     .is-rotate {
       transform: rotate(180deg);
     }
-  }
-  .no-more {
-    margin-bottom: 0;
-  }
-  .no-more-text {
-    font-size: $font-size-medium;
-    color: $color-pink;
   }
 }
 </style>

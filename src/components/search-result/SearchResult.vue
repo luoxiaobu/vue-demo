@@ -14,10 +14,13 @@
         </template>
       </li>
     </ul>
+    <p class="no-more-text" v-show="!this.loading&&!hasMore&&!noData">没有更多数据了~~</p>
+    <no-result v-show="noData" :title="query"></no-result>
   </a-scroll>
 </template>
 <script>
 import AScroll from 'components/common/AScroll'
+import NoResult from 'components/common/NoResult'
 import { searchResult } from 'service/search';
 import { getplaysongvkey } from 'service/song';
 import { createSong } from 'components/singer-detail/song';
@@ -51,7 +54,7 @@ export default {
     }
   },
   components: {
-    AScroll
+    AScroll, NoResult
   },
   data () {
     return {
@@ -68,6 +71,11 @@ export default {
         this.initData();
         this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
       }
+    }
+  },
+  computed: {
+    noData () {
+      return (this.result.length === 1) && (this.result[0].length === 0)
     }
   },
   methods: {
@@ -203,6 +211,13 @@ export default {
       no-wrap()
       color: #808080;
       font-size: $font-size-small;
+    }
+    .no-more-text {
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-size: $font-size-medium;
+      color: $color-pink;
     }
   }
 </style>
