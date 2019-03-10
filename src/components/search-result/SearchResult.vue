@@ -62,13 +62,15 @@ export default {
       page: 0,
       hasMore: true,
       loading: false,
-      TYPE_SINGER
+      TYPE_SINGER,
+      cancelSearchResult: null
     }
   },
   watch: {
     query () {
       if (this.query) {
         this.initData();
+        this.cancelSearchResult && this.cancelSearchResult('cancel before')
         this.searchResult(this.query, this.page + 1, this.showSinger, this.perpage);
       }
     }
@@ -141,11 +143,13 @@ export default {
         return
       }
       this.loading = true;
-      searchResult(query, page, showSinger, perpage).then((data) => {
+      let search = searchResult(query, page, showSinger, perpage)
+      this.cancelSearchResult = search.cancel;
+      search.then((data) => {
         this.page++
         this.result.splice(this.page, 0, this.dealResult(data));
         this.checkMore(data);
-        this.$refs.result.onBottomLoaded();
+        this.$refs.result.onBottomLoaded && this.$refs.result.onBottomLoaded();
         this.loading = false;
       }).catch(() => {
         // error still not processe
