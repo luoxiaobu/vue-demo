@@ -122,8 +122,8 @@ export default {
       let height = 0
       this.listHeight.push(height)
       for (let i = 0; i < list.length - 1; i++) {
-        let item = list[i]
-        height += item.clientHeight
+        let itemHight = list[i].clientHeight
+        height += itemHight
         this.listHeight.push(height)
       }
     },
