@@ -80,7 +80,9 @@ export default {
   },
   methods: {
     scrollTo (y) {
-      this.$refs.scroll.scrollTop = y;
+      requestAnimationFrame(() => {
+        this.$refs.scroll.scrollTop = y;
+      })
     },
     init () {
       this.scrollEle = this.$refs.scroll;
